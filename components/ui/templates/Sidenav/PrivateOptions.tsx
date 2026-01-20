@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useState, useEffect, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Brain,
   Clock,
@@ -13,8 +13,8 @@ import {
   Languages,
   GraduationCap,
   SearchCode,
-} from 'lucide-react';
-import { MenuItem } from '@/components/ui/molecules/MenuItem';
+} from "lucide-react";
+import { MenuItem } from "@/components/ui/molecules/MenuItem";
 
 export interface PrivateOptionsProps {
   isCollapsed?: boolean;
@@ -23,28 +23,32 @@ export interface PrivateOptionsProps {
 
 // Route configuration for menu items
 const ROUTE_CONFIG = [
-  { pattern: '/genai', item: 'genai' },
-  { pattern: '/last-updates', item: 'updates' },
-  { pattern: '/processes/favorites', item: 'processos', subItem: 'favoritos' },
-  { pattern: '/processes/vectorization-search', item: 'processos', subItem: 'vetorizacao' },
-  { pattern: '/processes/search', item: 'processos', subItem: 'buscar' },
-  { pattern: '/processes/details', item: 'processos' },
-  { pattern: '/settings/language', item: 'idiomas' },
+  { pattern: "/genai", item: "genai" },
+  { pattern: "/last-updates", item: "updates" },
+  { pattern: "/processes/favorites", item: "processos", subItem: "favoritos" },
+  {
+    pattern: "/processes/vectorization-search",
+    item: "processos",
+    subItem: "vetorizacao",
+  },
+  { pattern: "/processes/search", item: "processos", subItem: "buscar" },
+  { pattern: "/processes/details", item: "processos" },
+  { pattern: "/settings/language", item: "idiomas" },
 ] as const;
 
 // Navigation routes for menu items
 const NAV_ROUTES: Record<string, string> = {
-  genai: '/genai',
-  updates: '/last-updates',
-  idiomas: '/settings/language',
+  genai: "/genai",
+  updates: "/last-updates",
+  idiomas: "/settings/language",
 };
 
 // Sub-item routes
 const SUB_ITEM_ROUTES: Record<string, Record<string, string>> = {
   processos: {
-    favoritos: '/processes/favorites',
-    buscar: '/processes/search',
-    vetorizacao: '/processes/vectorization-search',
+    favoritos: "/processes/favorites",
+    buscar: "/processes/search",
+    vetorizacao: "/processes/vectorization-search",
   },
 };
 
@@ -65,7 +69,7 @@ export function PrivateOptions({
     for (const config of ROUTE_CONFIG) {
       if (pathname.includes(config.pattern)) {
         // Skip language route for Vibra tenant
-        if (config.item === 'idiomas' && isVibraTenant) continue;
+        if (config.item === "idiomas" && isVibraTenant) continue;
         return config;
       }
     }
@@ -76,7 +80,7 @@ export function PrivateOptions({
   useEffect(() => {
     if (routeMatch) {
       setActiveItem(routeMatch.item);
-      if ('subItem' in routeMatch && routeMatch.subItem) {
+      if ("subItem" in routeMatch && routeMatch.subItem) {
         setActiveSubItem(routeMatch.subItem);
         setOpenDropdown(routeMatch.item);
       } else {
@@ -95,7 +99,7 @@ export function PrivateOptions({
 
   const navigateTo = (item: string) => {
     // Block language menu for Vibra tenant
-    if (item === 'idiomas' && isVibraTenant) return;
+    if (item === "idiomas" && isVibraTenant) return;
 
     setActiveItem(item);
     setActiveSubItem(null);
@@ -123,10 +127,10 @@ export function PrivateOptions({
       <div className="mb-2">
         <MenuItem
           icon={Brain}
-          isActive={activeItem === 'genai'}
-          onClick={() => navigateTo('genai')}
+          isActive={activeItem === "genai"}
+          onClick={() => navigateTo("genai")}
         >
-          {!isCollapsed && t('menu.private.genAI').toUpperCase()}
+          {!isCollapsed && t("menu.private.genAI").toUpperCase()}
         </MenuItem>
       </div>
 
@@ -134,10 +138,10 @@ export function PrivateOptions({
       <div className="mb-2">
         <MenuItem
           icon={Clock}
-          isActive={activeItem === 'updates'}
-          onClick={() => navigateTo('updates')}
+          isActive={activeItem === "updates"}
+          onClick={() => navigateTo("updates")}
         >
-          {!isCollapsed && t('menu.private.lastUpdates').toUpperCase()}
+          {!isCollapsed && t("menu.private.lastUpdates").toUpperCase()}
         </MenuItem>
       </div>
 
@@ -145,43 +149,46 @@ export function PrivateOptions({
       <div className="mb-2">
         <MenuItem
           icon={FileText}
-          isActive={activeItem === 'processos'}
+          isActive={activeItem === "processos"}
           hasDropdown={!isCollapsed}
-          isOpen={openDropdown === 'processos'}
-          onClick={() => toggleDropdown('processos')}
+          isOpen={openDropdown === "processos"}
+          onClick={() => toggleDropdown("processos")}
         >
-          {!isCollapsed && t('menu.private.processes').toUpperCase()}
+          {!isCollapsed && t("menu.private.processes").toUpperCase()}
         </MenuItem>
 
-        {openDropdown === 'processos' && (
-          <div className={isCollapsed ? 'mt-2' : 'ml-4 mt-2'}>
+        {openDropdown === "processos" && (
+          <div className={isCollapsed ? "mt-2" : "ml-4 mt-2"}>
             <div className="mb-1.5">
               <MenuItem
                 icon={Star}
                 variant="sub-item"
-                isActive={activeSubItem === 'favoritos'}
-                onClick={() => navigateToSubItem('processos', 'favoritos')}
+                isActive={activeSubItem === "favoritos"}
+                onClick={() => navigateToSubItem("processos", "favoritos")}
               >
-                {!isCollapsed && t('menu.private.favorites').toUpperCase()}
+                {!isCollapsed && t("menu.private.favorites").toUpperCase()}
               </MenuItem>
             </div>
             <div className="mb-1.5">
               <MenuItem
                 icon={Search}
                 variant="sub-item"
-                isActive={activeSubItem === 'buscar'}
-                onClick={() => navigateToSubItem('processos', 'buscar')}
+                isActive={activeSubItem === "buscar"}
+                onClick={() => navigateToSubItem("processos", "buscar")}
               >
-                {!isCollapsed && t('menu.private.searchProcesses').toUpperCase()}
+                {!isCollapsed &&
+                  t("menu.private.searchProcesses").toUpperCase()}
               </MenuItem>
             </div>
             <MenuItem
               icon={SearchCode}
+              disabled
               variant="sub-item"
-              isActive={activeSubItem === 'vetorizacao'}
-              onClick={() => navigateToSubItem('processos', 'vetorizacao')}
+              isActive={activeSubItem === "vetorizacao"}
+              onClick={() => navigateToSubItem("processos", "vetorizacao")}
             >
-              {!isCollapsed && t('menu.private.vectorizationSearch').toUpperCase()}
+              {!isCollapsed &&
+                t("menu.private.vectorizationSearch").toUpperCase()}
             </MenuItem>
           </div>
         )}
@@ -191,11 +198,11 @@ export function PrivateOptions({
       <div className="mb-2">
         <MenuItem
           icon={Languages}
-          isActive={activeItem === 'idiomas' && !isVibraTenant}
+          isActive={activeItem === "idiomas" && !isVibraTenant}
           disabled={isVibraTenant}
-          onClick={() => navigateTo('idiomas')}
+          onClick={() => navigateTo("idiomas")}
         >
-          {!isCollapsed && t('menu.private.languages').toUpperCase()}
+          {!isCollapsed && t("menu.private.languages").toUpperCase()}
         </MenuItem>
       </div>
 
@@ -203,11 +210,11 @@ export function PrivateOptions({
       <div className="mb-2">
         <MenuItem
           icon={GraduationCap}
-          isActive={activeItem === 'training'}
+          isActive={activeItem === "training"}
           disabled
-          onClick={() => navigateTo('training')}
+          onClick={() => navigateTo("training")}
         >
-          {!isCollapsed && t('menu.private.training').toUpperCase()}
+          {!isCollapsed && t("menu.private.training").toUpperCase()}
         </MenuItem>
       </div>
 
@@ -215,11 +222,11 @@ export function PrivateOptions({
       <div className="mb-2">
         <MenuItem
           icon={Shield}
-          isActive={activeItem === 'admin'}
+          isActive={activeItem === "admin"}
           disabled
-          onClick={() => navigateTo('admin')}
+          onClick={() => navigateTo("admin")}
         >
-          {!isCollapsed && t('menu.private.admin').toUpperCase()}
+          {!isCollapsed && t("menu.private.admin").toUpperCase()}
         </MenuItem>
       </div>
     </div>

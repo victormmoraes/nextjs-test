@@ -1,7 +1,16 @@
 'use client';
 
-import { useState, useMemo, useRef, useId, forwardRef, useImperativeHandle } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  useState,
+  useMemo,
+  useRef,
+  useId,
+  forwardRef,
+  useImperativeHandle,
+  useCallback,
+  useEffect,
+} from 'react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useClickOutside } from '@/hooks';
@@ -13,17 +22,279 @@ export interface InputCalendarRef {
   blur: () => void;
 }
 
-// Generate years (current year - 100 to current year + 10)
-const generateYears = () => {
+// ============================================================================
+// Date Utility Functions
+// ============================================================================
+
+function normalizeDate(date: Date): Date {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function isDateDisabled(
+  date: Date,
+  minDate: Date | null,
+  maxDate: Date | null
+): boolean {
+  const dateOnly = normalizeDate(date);
+  if (minDate && dateOnly < normalizeDate(minDate)) return true;
+  if (maxDate && dateOnly > normalizeDate(maxDate)) return true;
+  return false;
+}
+
+function isSameDay(date1: Date, date2: Date): boolean {
+  return (
+    date1.getDate() === date2.getDate() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getFullYear() === date2.getFullYear()
+  );
+}
+
+function generateYearRange(
+  minDate: Date | null,
+  maxDate: Date | null
+): number[] {
   const currentYear = new Date().getFullYear();
+  const startYear = minDate ? minDate.getFullYear() : currentYear - 100;
+  const endYear = maxDate ? maxDate.getFullYear() : currentYear + 10;
+
   const years: number[] = [];
-  for (let i = currentYear - 100; i <= currentYear + 10; i++) {
+  for (let i = startYear; i <= endYear; i++) {
     years.push(i);
   }
   return years;
-};
+}
 
-const YEARS = generateYears();
+function generateCalendarDays(
+  year: number,
+  month: number,
+  selectedDate: Date | null,
+  minDate: Date | null,
+  maxDate: Date | null
+): CalendarDay[] {
+  const days: CalendarDay[] = [];
+  const today = new Date();
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const prevLastDay = new Date(year, month, 0);
+
+  const firstDayOfWeek = firstDay.getDay();
+  const lastDateOfMonth = lastDay.getDate();
+  const prevLastDate = prevLastDay.getDate();
+
+  // Previous month days
+  for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+    const date = new Date(year, month - 1, prevLastDate - i);
+    days.push({
+      day: prevLastDate - i,
+      date,
+      isCurrentMonth: false,
+      isToday: false,
+      isSelected: false,
+      isDisabled: isDateDisabled(date, minDate, maxDate),
+    });
+  }
+
+  // Current month days
+  for (let i = 1; i <= lastDateOfMonth; i++) {
+    const date = new Date(year, month, i);
+    days.push({
+      day: i,
+      date,
+      isCurrentMonth: true,
+      isToday: isSameDay(date, today),
+      isSelected: selectedDate ? isSameDay(date, selectedDate) : false,
+      isDisabled: isDateDisabled(date, minDate, maxDate),
+    });
+  }
+
+  // Next month days (fill to 42 cells for consistent grid)
+  const remainingDays = 42 - days.length;
+  for (let i = 1; i <= remainingDays; i++) {
+    const date = new Date(year, month + 1, i);
+    days.push({
+      day: i,
+      date,
+      isCurrentMonth: false,
+      isToday: false,
+      isSelected: false,
+      isDisabled: isDateDisabled(date, minDate, maxDate),
+    });
+  }
+
+  return days;
+}
+
+// ============================================================================
+// CalendarDropdown Component (Internal)
+// ============================================================================
+
+interface CalendarDropdownProps {
+  value: number;
+  options: { value: number; label: string }[];
+  onChange: (value: number) => void;
+  className?: string;
+}
+
+function CalendarDropdown({
+  value,
+  options,
+  onChange,
+  className,
+}: CalendarDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const selectedIndex = useMemo(
+    () => options.findIndex((opt) => opt.value === value),
+    [options, value]
+  );
+
+  const selectedLabel = useMemo(() => {
+    const option = options.find((opt) => opt.value === value);
+    return option?.label ?? '';
+  }, [options, value]);
+
+  // Close on click outside
+  useClickOutside(containerRef, () => setIsOpen(false), isOpen);
+
+  // Scroll to selected item when opened
+  useEffect(() => {
+    if (isOpen && listRef.current && selectedIndex >= 0) {
+      const items = listRef.current.querySelectorAll('button');
+      const selectedItem = items[selectedIndex];
+      if (selectedItem) {
+        selectedItem.scrollIntoView({ block: 'center' });
+      }
+    }
+  }, [isOpen, selectedIndex]);
+
+  const toggleDropdown = () => {
+    setIsOpen((prev) => !prev);
+    if (!isOpen) {
+      setHighlightedIndex(selectedIndex >= 0 ? selectedIndex : 0);
+    }
+  };
+
+  const selectOption = useCallback((optionValue: number) => {
+    onChange(optionValue);
+    setIsOpen(false);
+    buttonRef.current?.focus();
+  }, [onChange]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      switch (e.key) {
+        case 'Enter':
+        case ' ':
+          e.preventDefault();
+          e.stopPropagation();
+          if (isOpen && highlightedIndex >= 0) {
+            selectOption(options[highlightedIndex].value);
+          } else {
+            toggleDropdown();
+          }
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          e.stopPropagation();
+          if (!isOpen) {
+            setIsOpen(true);
+            setHighlightedIndex(selectedIndex >= 0 ? selectedIndex : 0);
+          } else {
+            setHighlightedIndex((prev) =>
+              prev < options.length - 1 ? prev + 1 : prev
+            );
+          }
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          e.stopPropagation();
+          if (isOpen) {
+            setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          e.stopPropagation();
+          setIsOpen(false);
+          buttonRef.current?.focus();
+          break;
+        case 'Home':
+          if (isOpen) {
+            e.preventDefault();
+            e.stopPropagation();
+            setHighlightedIndex(0);
+          }
+          break;
+        case 'End':
+          if (isOpen) {
+            e.preventDefault();
+            e.stopPropagation();
+            setHighlightedIndex(options.length - 1);
+          }
+          break;
+      }
+    },
+    [isOpen, highlightedIndex, options, selectedIndex, selectOption]
+  );
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <button
+        ref={buttonRef}
+        type="button"
+        onClick={toggleDropdown}
+        onKeyDown={handleKeyDown}
+        className={cn(
+          'flex items-center justify-between gap-1 px-2 py-1 border border-gray-300 rounded-sm text-sm',
+          'focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none',
+          'bg-white hover:bg-gray-50 transition-colors',
+          className
+        )}
+      >
+        <span className="truncate">{selectedLabel}</span>
+        <ChevronDown
+          size={14}
+          className={cn('text-gray-500 transition-transform shrink-0', isOpen && 'rotate-180')}
+        />
+      </button>
+
+      {isOpen && (
+        <div
+          ref={listRef}
+          className="absolute z-[60] mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-48 overflow-auto min-w-full"
+        >
+          {options.map((option, index) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => selectOption(option.value)}
+              onMouseEnter={() => setHighlightedIndex(index)}
+              className={cn(
+                'w-full text-left px-3 py-1.5 text-sm transition-colors',
+                'focus:outline-none',
+                option.value === value && 'bg-primary-50 text-primary-800 font-medium',
+                highlightedIndex === index && option.value !== value && 'bg-gray-100'
+              )}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
+// InputCalendar Component
+// ============================================================================
 
 export const InputCalendar = forwardRef<InputCalendarRef, InputCalendarProps>(
   (
@@ -53,8 +324,12 @@ export const InputCalendar = forwardRef<InputCalendarRef, InputCalendarProps>(
     const inputRef = useRef<HTMLInputElement>(null);
 
     const [showCalendar, setShowCalendar] = useState(false);
-    const [currentMonth, setCurrentMonth] = useState(value?.getMonth() ?? new Date().getMonth());
-    const [currentYear, setCurrentYear] = useState(value?.getFullYear() ?? new Date().getFullYear());
+    const [currentMonth, setCurrentMonth] = useState(
+      value?.getMonth() ?? new Date().getMonth()
+    );
+    const [currentYear, setCurrentYear] = useState(
+      value?.getFullYear() ?? new Date().getFullYear()
+    );
 
     useImperativeHandle(ref, () => ({
       focus: () => inputRef.current?.focus(),
@@ -63,20 +338,27 @@ export const InputCalendar = forwardRef<InputCalendarRef, InputCalendarProps>(
 
     useClickOutside(containerRef, () => setShowCalendar(false), showCalendar);
 
+    // Localized days of week
     const daysOfWeek = useMemo(() => {
       try {
         const days = t.raw('daysOfWeek');
-        return Array.isArray(days) ? days : ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        return Array.isArray(days)
+          ? days
+          : ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
       } catch {
         return ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
       }
     }, [t]);
 
+    // Localized months
     const months = useMemo(() => {
       try {
         const monthsArray = t.raw('months');
         if (Array.isArray(monthsArray)) {
-          return monthsArray.map((label: string, index: number) => ({ value: index, label }));
+          return monthsArray.map((label: string, index: number) => ({
+            value: index,
+            label,
+          }));
         }
       } catch {
         // fallback
@@ -97,6 +379,13 @@ export const InputCalendar = forwardRef<InputCalendarRef, InputCalendarProps>(
       ];
     }, [t]);
 
+    // Year options (respects minDate/maxDate constraints)
+    const years = useMemo(() => {
+      const yearRange = generateYearRange(minDate, maxDate);
+      return yearRange.map((year) => ({ value: year, label: String(year) }));
+    }, [minDate, maxDate]);
+
+    // Formatted display value
     const displayValue = useMemo(() => {
       if (!value) return '';
       const day = String(value.getDate()).padStart(2, '0');
@@ -109,94 +398,15 @@ export const InputCalendar = forwardRef<InputCalendarRef, InputCalendarProps>(
       return `${day}/${month}/${year}`;
     }, [value, locale]);
 
-    const calendarDays = useMemo((): CalendarDay[] => {
-      const days: CalendarDay[] = [];
-      const today = new Date();
+    // Calendar days grid
+    const calendarDays = useMemo(
+      () => generateCalendarDays(currentYear, currentMonth, value ?? null, minDate, maxDate),
+      [currentYear, currentMonth, value, minDate, maxDate]
+    );
 
-      const firstDay = new Date(currentYear, currentMonth, 1);
-      const lastDay = new Date(currentYear, currentMonth + 1, 0);
-      const prevLastDay = new Date(currentYear, currentMonth, 0);
-
-      const firstDayOfWeek = firstDay.getDay();
-      const lastDateOfMonth = lastDay.getDate();
-      const prevLastDate = prevLastDay.getDate();
-
-      const isDateDisabled = (date: Date): boolean => {
-        const dateOnly = new Date(date);
-        dateOnly.setHours(0, 0, 0, 0);
-
-        if (minDate) {
-          const min = new Date(minDate);
-          min.setHours(0, 0, 0, 0);
-          if (dateOnly < min) return true;
-        }
-
-        if (maxDate) {
-          const max = new Date(maxDate);
-          max.setHours(0, 0, 0, 0);
-          if (dateOnly > max) return true;
-        }
-
-        return false;
-      };
-
-      // Previous month days
-      for (let i = firstDayOfWeek - 1; i >= 0; i--) {
-        const date = new Date(currentYear, currentMonth - 1, prevLastDate - i);
-        days.push({
-          day: prevLastDate - i,
-          date,
-          isCurrentMonth: false,
-          isToday: false,
-          isSelected: false,
-          isDisabled: isDateDisabled(date),
-        });
-      }
-
-      // Current month days
-      for (let i = 1; i <= lastDateOfMonth; i++) {
-        const date = new Date(currentYear, currentMonth, i);
-        const isToday =
-          date.getDate() === today.getDate() &&
-          date.getMonth() === today.getMonth() &&
-          date.getFullYear() === today.getFullYear();
-
-        const isSelected = value
-          ? date.getDate() === value.getDate() &&
-            date.getMonth() === value.getMonth() &&
-            date.getFullYear() === value.getFullYear()
-          : false;
-
-        days.push({
-          day: i,
-          date,
-          isCurrentMonth: true,
-          isToday,
-          isSelected,
-          isDisabled: isDateDisabled(date),
-        });
-      }
-
-      // Next month days
-      const remainingDays = 42 - days.length;
-      for (let i = 1; i <= remainingDays; i++) {
-        const date = new Date(currentYear, currentMonth + 1, i);
-        days.push({
-          day: i,
-          date,
-          isCurrentMonth: false,
-          isToday: false,
-          isSelected: false,
-          isDisabled: isDateDisabled(date),
-        });
-      }
-
-      return days;
-    }, [currentMonth, currentYear, value, minDate, maxDate]);
-
-    const toggleCalendar = () => {
+    const openCalendar = () => {
       if (!disabled) {
-        setShowCalendar((prev) => !prev);
+        setShowCalendar(true);
       }
     };
 
@@ -255,8 +465,8 @@ export const InputCalendar = forwardRef<InputCalendarRef, InputCalendarProps>(
             disabled={disabled}
             required={required}
             value={displayValue}
-            onClick={toggleCalendar}
-            onFocus={() => setShowCalendar(true)}
+            onClick={openCalendar}
+            onFocus={openCalendar}
             readOnly
             className={cn(
               'block w-full px-3 py-2 pr-10 rounded-sm border border-gray-300',
@@ -293,29 +503,19 @@ export const InputCalendar = forwardRef<InputCalendarRef, InputCalendarProps>(
               </button>
 
               <div className="flex items-center gap-2">
-                <select
+                <CalendarDropdown
                   value={currentMonth}
-                  onChange={(e) => setCurrentMonth(Number(e.target.value))}
-                  className="px-2 py-1 border border-gray-300 rounded-sm text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
-                >
-                  {months.map((month) => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                    </option>
-                  ))}
-                </select>
+                  options={months}
+                  onChange={setCurrentMonth}
+                  className="w-[100px]"
+                />
 
-                <select
+                <CalendarDropdown
                   value={currentYear}
-                  onChange={(e) => setCurrentYear(Number(e.target.value))}
-                  className="px-2 py-1 border border-gray-300 rounded-sm text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none"
-                >
-                  {YEARS.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
+                  options={years}
+                  onChange={setCurrentYear}
+                  className="w-[70px]"
+                />
               </div>
 
               <button
@@ -330,7 +530,10 @@ export const InputCalendar = forwardRef<InputCalendarRef, InputCalendarProps>(
             {/* Days of week */}
             <div className="grid grid-cols-7 gap-1 mb-2">
               {daysOfWeek.map((day: string) => (
-                <div key={day} className="text-center text-xs font-semibold text-gray-600 py-2">
+                <div
+                  key={day}
+                  className="text-center text-xs font-semibold text-gray-600 py-2"
+                >
                   {day}
                 </div>
               ))}
@@ -347,10 +550,15 @@ export const InputCalendar = forwardRef<InputCalendarRef, InputCalendarProps>(
                   className={cn(
                     'py-2 text-sm rounded transition-colors disabled:cursor-not-allowed',
                     day.isSelected && 'bg-primary-800 text-white',
-                    day.isToday && !day.isSelected && 'bg-primary-50 text-primary-800 font-semibold',
+                    day.isToday &&
+                      !day.isSelected &&
+                      'bg-primary-50 text-primary-800 font-semibold',
                     day.isDisabled && 'text-gray-300 line-through',
                     !day.isCurrentMonth && !day.isDisabled && 'text-gray-400',
-                    day.isCurrentMonth && !day.isSelected && !day.isDisabled && 'hover:bg-gray-100'
+                    day.isCurrentMonth &&
+                      !day.isSelected &&
+                      !day.isDisabled &&
+                      'hover:bg-gray-100'
                   )}
                 >
                   {day.day}

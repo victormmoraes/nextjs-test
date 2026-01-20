@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
-import { Search } from 'lucide-react';
-import { Card } from '@/components/ui/molecules/Card';
-import { Input } from '@/components/ui/atoms/Input';
-import { InputCalendar } from '@/components/ui/molecules/InputCalendar';
-import { TableSearch } from '@/components/ui/organisms/TableSearch';
-import { useProcesses } from '@/hooks/useProcesses';
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Search } from "lucide-react";
+import { Card } from "@/components/ui/molecules/Card";
+import { Input } from "@/components/ui/atoms/Input";
+import { InputCalendar } from "@/components/ui/molecules/InputCalendar";
+import { TableSearch } from "@/components/ui/organisms/TableSearch";
+import { useProcesses } from "@/hooks/useProcesses";
 
 /**
  * Search Processes Page
@@ -25,13 +25,15 @@ export default function SearchProcessesPage() {
   const searchParams = useSearchParams();
 
   // Initialize state from URL params
-  const [searchTerm, setSearchTerm] = useState(() => searchParams.get('q') || '');
+  const [searchTerm, setSearchTerm] = useState(
+    () => searchParams.get("q") || "",
+  );
   const [startDate, setStartDate] = useState<Date | null>(() => {
-    const start = searchParams.get('start');
+    const start = searchParams.get("start");
     return start ? new Date(start) : null;
   });
   const [endDate, setEndDate] = useState<Date | null>(() => {
-    const end = searchParams.get('end');
+    const end = searchParams.get("end");
     return end ? new Date(end) : null;
   });
   const [totalCount, setTotalCount] = useState(0);
@@ -45,7 +47,11 @@ export default function SearchProcessesPage() {
 
   // Check if any filters are applied
   const hasFilters = useMemo(() => {
-    return (searchTerm && searchTerm.trim().length > 0) || startDate !== null || endDate !== null;
+    return (
+      (searchTerm && searchTerm.trim().length > 0) ||
+      startDate !== null ||
+      endDate !== null
+    );
   }, [searchTerm, startDate, endDate]);
 
   // Update URL query params when search state changes
@@ -54,13 +60,13 @@ export default function SearchProcessesPage() {
       const params = new URLSearchParams();
 
       if (term?.trim()) {
-        params.set('q', term.trim());
+        params.set("q", term.trim());
       }
       if (start) {
-        params.set('start', start.toISOString().split('T')[0]);
+        params.set("start", start.toISOString().split("T")[0]);
       }
       if (end) {
-        params.set('end', end.toISOString().split('T')[0]);
+        params.set("end", end.toISOString().split("T")[0]);
       }
 
       const queryString = params.toString();
@@ -68,7 +74,7 @@ export default function SearchProcessesPage() {
 
       router.replace(newUrl, { scroll: false });
     },
-    [router]
+    [router],
   );
 
   // Sync URL params after initialization
@@ -126,7 +132,7 @@ export default function SearchProcessesPage() {
       <Card>
         {/* Title */}
         <h2 className="text-base lg:text-lg font-semibold text-gray-900 mb-4 pb-4 border-b border-gray-200">
-          {t('search.title')}
+          {t("search.title")}
         </h2>
 
         {/* Desktop: Horizontal layout */}
@@ -136,7 +142,7 @@ export default function SearchProcessesPage() {
             <Input
               value={searchTerm}
               onChange={handleSearchChange}
-              placeholder={t('search.placeholder')}
+              placeholder={t("search.placeholder")}
               suffixIcon={Search}
               suffixIconClickable
               onSuffixIconClick={handleSearchClick}
@@ -146,7 +152,7 @@ export default function SearchProcessesPage() {
           {/* Start Date */}
           <div className="w-40">
             <InputCalendar
-              label={t('search.startDate')}
+              label={t("search.startDate")}
               placeholder="DD/MM/YYYY"
               value={startDate}
               onChange={handleStartDateChange}
@@ -156,7 +162,7 @@ export default function SearchProcessesPage() {
           {/* End Date */}
           <div className="w-40">
             <InputCalendar
-              label={t('search.endDate')}
+              label={t("search.endDate")}
               placeholder="DD/MM/YYYY"
               value={endDate}
               minDate={startDate}
@@ -173,7 +179,7 @@ export default function SearchProcessesPage() {
             <Input
               value={searchTerm}
               onChange={handleSearchChange}
-              placeholder={t('search.placeholder')}
+              placeholder={t("search.placeholder")}
               suffixIcon={Search}
               suffixIconClickable
               onSuffixIconClick={handleSearchClick}
@@ -183,14 +189,14 @@ export default function SearchProcessesPage() {
           {/* Dates side by side */}
           <div className="grid grid-cols-2 gap-3">
             <InputCalendar
-              label={t('search.startDate')}
+              label={t("search.startDate")}
               placeholder="DD/MM/YY"
               value={startDate}
               onChange={handleStartDateChange}
             />
 
             <InputCalendar
-              label={t('search.endDate')}
+              label={t("search.endDate")}
               placeholder="DD/MM/YY"
               value={endDate}
               minDate={startDate}
@@ -208,7 +214,7 @@ export default function SearchProcessesPage() {
             {/* Title with count */}
             <div className="px-4 lg:px-8 py-4 lg:py-6 border-b border-gray-200">
               <h2 className="text-base lg:text-lg font-semibold text-gray-900">
-                {t('search.results')}
+                {t("search.results")}
                 {totalCount > 0 && ` (${totalCount})`}
               </h2>
             </div>
