@@ -13,6 +13,7 @@ export interface LoginResponse {
     name: string;
     email: string;
     tenantId: number;
+    tenantName: string;
     roles: string[];
   };
 }

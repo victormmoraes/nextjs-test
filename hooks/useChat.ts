@@ -153,12 +153,19 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
         });
 
         if (!response.ok) {
+          // Handle 401 by redirecting to login
+          if (response.status === 401) {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+            return;
+          }
+
           const errorData = await response.json().catch(() => ({}));
           let errorType: ChatErrorType = 'UNKNOWN';
 
-          if (response.status === 401) {
-            errorType = 'NETWORK_ERROR';
-          } else if (response.status === 400) {
+          if (response.status === 400) {
             errorType = 'BAD_REQUEST';
           } else if (response.status === 503) {
             errorType = 'SERVICE_UNAVAILABLE';

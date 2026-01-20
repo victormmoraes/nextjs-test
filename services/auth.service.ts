@@ -19,6 +19,7 @@ export const authService = {
     const user = await prisma.user.findUnique({
       where: { email, enabled: true },
       include: {
+        tenant: true,
         roles: {
           include: { role: true },
         },
@@ -82,6 +83,7 @@ export const authService = {
         name: user.name,
         email: user.email,
         tenantId: user.tenantId,
+        tenantName: user.tenant.name,
         roles,
       },
     };

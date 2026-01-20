@@ -15,6 +15,7 @@ interface User {
   name: string;
   email: string;
   tenantId: number;
+  tenantName: string;
   roles: string[];
 }
 
@@ -158,4 +159,43 @@ export function useAuth() {
 export function getAccessToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem(ACCESS_TOKEN_KEY);
+}
+
+// Helper to clear auth and redirect on 401
+function clearAuthAndRedirect() {
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  window.location.href = '/login';
+}
+
+/**
+ * Authenticated fetch wrapper that handles 401 errors.
+ * Automatically adds Authorization header and redirects to login on auth failure.
+ */
+export async function authFetch(
+  url: string,
+  options: RequestInit = {}
+): Promise<Response> {
+  const token = getAccessToken();
+
+  if (!token) {
+    clearAuthAndRedirect();
+    throw new Error('Not authenticated');
+  }
+
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (response.status === 401) {
+    clearAuthAndRedirect();
+    throw new Error('Session expired');
+  }
+
+  return response;
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { getAccessToken } from '@/contexts/AuthContext';
+import { authFetch } from '@/contexts/AuthContext';
 import type { ProcessWithRelations } from '@/types/process';
 import type { ProcessSummary } from '@prisma/client';
 
@@ -43,11 +43,6 @@ export function useProcesses(options: UseProcessesOptions = {}): UseProcessesRes
     setError(null);
 
     try {
-      const token = getAccessToken();
-      if (!token) {
-        throw new Error('Not authenticated');
-      }
-
       const params = new URLSearchParams();
       params.set('page', '1');
       params.set('pageSize', pageSize.toString());
@@ -62,11 +57,7 @@ export function useProcesses(options: UseProcessesOptions = {}): UseProcessesRes
         params.set('isFavorite', options.isFavorite.toString());
       }
 
-      const response = await fetch(`/api/processes?${params.toString()}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await authFetch(`/api/processes?${params.toString()}`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch processes');
@@ -115,15 +106,9 @@ export function useProcesses(options: UseProcessesOptions = {}): UseProcessesRes
   });
 
   const toggleFavorite = useCallback(async (processId: string) => {
-    const token = getAccessToken();
-    if (!token) return;
-
     try {
-      const response = await fetch(`/api/processes/${processId}/favorite`, {
+      const response = await authFetch(`/api/processes/${processId}/favorite`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (response.ok) {
@@ -150,15 +135,8 @@ export function useProcesses(options: UseProcessesOptions = {}): UseProcessesRes
   }, []);
 
   const loadSummary = useCallback(async (processId: string): Promise<ProcessSummary | null> => {
-    const token = getAccessToken();
-    if (!token) return null;
-
     try {
-      const response = await fetch(`/api/processes/${processId}/summary`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await authFetch(`/api/processes/${processId}/summary`);
 
       if (response.ok) {
         const data = await response.json();

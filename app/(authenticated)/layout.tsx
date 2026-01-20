@@ -28,7 +28,7 @@ function AuthenticatedContent({ children }: { children: React.ReactNode }) {
       >
         <Header
           userName={user?.name || ''}
-          tenantName={user?.tenantId?.toString() || ''}
+          tenantName={user?.tenantName || ''}
           onLogout={handleLogout}
         />
         <main>{children}</main>

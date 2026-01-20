@@ -65,7 +65,7 @@ function LoginForm() {
       const safeReturnUrl =
         returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//')
           ? returnUrl
-          : '/home/last-updates';
+          : '/last-updates';
       router.push(safeReturnUrl);
     } catch (error) {
       // Calculate remaining delay for consistent UX
