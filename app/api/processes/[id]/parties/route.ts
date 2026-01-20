@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { processService } from "@/services/process.service";
 import { addInterestedPartySchema } from "@/lib/validators/process";
-import { withAuth } from "@/lib/auth/middleware";
+import { withAuth, hasTenantAccess } from "@/lib/auth/middleware";
 import { successResponse, handleError, errorResponse } from "@/lib/utils/response";
 
 type Params = { params: Promise<{ id: string }> };
@@ -11,10 +11,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     try {
       const { id } = await params;
 
-      // Check tenant access
       const existing = await processService.findById(id);
-      const isAdmin = user.roles.includes("ADMIN");
-      if (!isAdmin && existing.tenantId !== user.tenantId) {
+      if (!hasTenantAccess(user, existing.tenantId)) {
         return errorResponse("Access denied to this process", 403);
       }
 
@@ -39,10 +37,8 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     try {
       const { id } = await params;
 
-      // Check tenant access
       const existing = await processService.findById(id);
-      const isAdmin = user.roles.includes("ADMIN");
-      if (!isAdmin && existing.tenantId !== user.tenantId) {
+      if (!hasTenantAccess(user, existing.tenantId)) {
         return errorResponse("Access denied to this process", 403);
       }
 

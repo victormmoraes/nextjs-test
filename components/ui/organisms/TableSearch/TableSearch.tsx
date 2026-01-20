@@ -13,13 +13,13 @@ import {
   CellTextButton,
 } from '@/components/ui/organisms/DataTable/cells';
 import type { DataTableColumn } from '@/components/ui/organisms/DataTable';
-import type { ProcessPresenter } from '@/types/process.types';
+import type { ProcessWithRelations } from '@/types/process';
 
 export interface TableSearchProps {
   searchTerm?: string;
   startDate?: Date | null;
   endDate?: Date | null;
-  processes: ProcessPresenter[];
+  processes: ProcessWithRelations[];
   loading?: boolean;
   onTotalCountChange?: (count: number) => void;
 }
@@ -54,7 +54,7 @@ export function TableSearch({
     return processes.filter(
       (p) =>
         p.processNumber.toLowerCase().includes(search) ||
-        p.classificationName.toLowerCase().includes(search) ||
+        p.classification.name.toLowerCase().includes(search) ||
         p.interestedParties.some((party) =>
           party.toLowerCase().includes(search)
         )
@@ -72,16 +72,16 @@ export function TableSearch({
     return filteredProcesses.slice(start, start + mobileItemsPerPage);
   }, [filteredProcesses, mobileCurrentPage]);
 
-  const formatDate = (dateString: string): string => {
-    const d = new Date(dateString);
+  const formatDate = (date: Date | string): string => {
+    const d = typeof date === 'string' ? new Date(date) : date;
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
   };
 
-  const trackById = (row: ProcessPresenter) => row.id;
+  const trackById = (row: ProcessWithRelations) => row.id;
 
   // Column definitions
   const columns = useMemo(
-    (): DataTableColumn<ProcessPresenter>[] => [
+    (): DataTableColumn<ProcessWithRelations>[] => [
       {
         key: 'processNumber',
         header: t('table.headers.processNumber'),
@@ -102,13 +102,13 @@ export function TableSearch({
         render: (row) => row.interestedParties.join(', '),
       },
       {
-        key: 'classificationName',
+        key: 'classification',
         header: t('table.headers.processType'),
         width: 'min-w-[200px]',
         align: 'center',
         cellClassName: 'text-secondary text-center',
         render: (row) => (
-          <TruncatedTextCell text={row.classificationName} maxWidth="180px" />
+          <TruncatedTextCell text={row.classification.name} maxWidth="180px" />
         ),
       },
       {
@@ -135,7 +135,7 @@ export function TableSearch({
         render: (row) => (
           <CellTextButton
             text={t('common.view')}
-            link={`/home/processes/details/${row.processNumber}`}
+            href={`/home/processes/details/${row.processNumber}`}
           />
         ),
       },
@@ -226,7 +226,7 @@ export function TableSearch({
                         {t('table.headers.processType')}
                       </span>
                       <p className="text-gray-900 font-medium truncate">
-                        {process.classificationName || '-'}
+                        {process.classification.name || '-'}
                       </p>
                     </div>
                   </div>

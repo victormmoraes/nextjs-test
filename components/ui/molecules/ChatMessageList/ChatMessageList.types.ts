@@ -1,4 +1,4 @@
-import type { ChatMessage } from '@/types/chat.types';
+import type { ChatMessage } from '@/types/chat';
 
 export interface ChatMessageListProps {
   /** Array of messages to display */

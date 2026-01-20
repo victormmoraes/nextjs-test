@@ -17,6 +17,9 @@ export function CellFavorite({ isFavorite = false, size = 16, onToggle }: CellFa
 
   return (
     <button
+      type="button"
+      aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+      aria-pressed={isFavorite}
       className={cn(
         'p-1 transition-colors',
         isFavorite ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-600'
@@ -24,7 +27,7 @@ export function CellFavorite({ isFavorite = false, size = 16, onToggle }: CellFa
       onClick={handleClick}
       data-no-row-click
     >
-      <Star size={size} className={isFavorite ? 'fill-yellow-500' : ''} />
+      <Star size={size} className={isFavorite ? 'fill-yellow-500' : ''} aria-hidden="true" />
     </button>
   );
 }

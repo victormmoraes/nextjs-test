@@ -1,4 +1,4 @@
-import type { MessageRole, ChatSource } from '@/types/chat.types';
+import type { MessageRole, ChatSource } from '@/types/chat';
 
 export interface ChatMessageProps {
   /** Message role: 'user' or 'assistant' */

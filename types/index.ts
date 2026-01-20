@@ -1,5 +1,7 @@
 export * from "./auth";
-export * from "./process.types";
+export * from "./process";
+export * from "./chat";
+export * from "./filters";
 
 // Re-export Prisma types for convenience
 export type {

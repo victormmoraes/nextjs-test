@@ -76,20 +76,33 @@ export function Pagination({
   };
 
   return (
-    <div className="flex items-center justify-between px-6 py-4 border-t border-gray-300 bg-white">
+    <nav
+      aria-label="Pagination"
+      className="flex items-center justify-between px-6 py-4 border-t border-gray-300 bg-white"
+    >
       <div className="text-sm text-secondary">
         {t('showing')} {startItem} {t('to')} {endItem}
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="pagination" size="xs" disabled={currentPage === 1} onClick={previousPage}>
-          <ChevronLeft size={16} />
+        <Button
+          variant="pagination"
+          size="xs"
+          disabled={currentPage === 1}
+          onClick={previousPage}
+          aria-label="Previous page"
+        >
+          <ChevronLeft size={16} aria-hidden="true" />
         </Button>
 
         <div className="flex items-center gap-1">
           {visiblePages.map((page, index) =>
             page === 'ellipsis' ? (
-              <span key={`ellipsis-${index}`} className="px-3 py-2 text-sm text-secondary">
+              <span
+                key={index < visiblePages.length / 2 ? 'ellipsis-start' : 'ellipsis-end'}
+                className="px-3 py-2 text-sm text-secondary"
+                aria-hidden="true"
+              >
                 ...
               </span>
             ) : (
@@ -98,6 +111,8 @@ export function Pagination({
                 variant={currentPage === page ? 'primary' : 'pagination'}
                 size="xs"
                 onClick={() => goToPage(page)}
+                aria-label={`Page ${page}`}
+                aria-current={currentPage === page ? 'page' : undefined}
               >
                 {page}
               </Button>
@@ -110,10 +125,11 @@ export function Pagination({
           size="xs"
           disabled={currentPage === totalPages}
           onClick={nextPage}
+          aria-label="Next page"
         >
-          <ChevronRight size={16} />
+          <ChevronRight size={16} aria-hidden="true" />
         </Button>
       </div>
-    </div>
+    </nav>
   );
 }

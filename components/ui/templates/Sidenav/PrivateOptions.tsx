@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
@@ -21,6 +21,37 @@ export interface PrivateOptionsProps {
   isVibraTenant?: boolean;
 }
 
+// Route configuration for menu items
+const ROUTE_CONFIG = [
+  { pattern: '/genai', item: 'genai' },
+  { pattern: '/home/gen-ai', item: 'genai' },
+  { pattern: '/last-updates', item: 'updates' },
+  { pattern: '/home/processes/favorites', item: 'processos', subItem: 'favoritos' },
+  { pattern: '/home/processes/vectorization-search', item: 'processos', subItem: 'vetorizacao' },
+  { pattern: '/home/processes/search', item: 'processos', subItem: 'buscar' },
+  { pattern: '/home/paineis', item: 'paineis' },
+  { pattern: '/home/processos', item: 'processos' },
+  { pattern: '/home/alertas', item: 'alertas' },
+  { pattern: '/home/admin', item: 'admin' },
+  { pattern: '/home/settings/language', item: 'idiomas' },
+] as const;
+
+// Navigation routes for menu items
+const NAV_ROUTES: Record<string, string> = {
+  genai: '/genai',
+  updates: '/last-updates',
+  idiomas: '/home/settings/language',
+};
+
+// Sub-item routes
+const SUB_ITEM_ROUTES: Record<string, Record<string, string>> = {
+  processos: {
+    favoritos: '/home/processes/favorites',
+    buscar: '/home/processes/search',
+    vetorizacao: '/home/processes/vectorization-search',
+  },
+};
+
 export function PrivateOptions({
   isCollapsed = false,
   isVibraTenant = false,
@@ -33,81 +64,60 @@ export function PrivateOptions({
   const [activeItem, setActiveItem] = useState<string | null>(null);
   const [activeSubItem, setActiveSubItem] = useState<string | null>(null);
 
-  // Set active item based on current route
-  useEffect(() => {
-    setActiveByRoute(pathname);
-  }, [pathname]);
+  // Determine active menu item based on current route
+  const routeMatch = useMemo(() => {
+    for (const config of ROUTE_CONFIG) {
+      if (pathname.includes(config.pattern)) {
+        // Skip language route for Vibra tenant
+        if (config.item === 'idiomas' && isVibraTenant) continue;
+        return config;
+      }
+    }
+    return null;
+  }, [pathname, isVibraTenant]);
 
-  const setActiveByRoute = (url: string) => {
-    if (url.includes('/genai') || url.includes('/home/gen-ai')) {
-      setActiveItem('genai');
-    } else if (url.includes('/home/last-updates')) {
-      setActiveItem('updates');
-    } else if (url.includes('/home/processes/favorites')) {
-      setActiveItem('processos');
-      setActiveSubItem('favoritos');
-      setOpenDropdown('processos');
-    } else if (url.includes('/home/processes/vectorization-search')) {
-      setActiveItem('processos');
-      setActiveSubItem('vetorizacao');
-      setOpenDropdown('processos');
-    } else if (url.includes('/home/processes/search')) {
-      setActiveItem('processos');
-      setActiveSubItem('buscar');
-      setOpenDropdown('processos');
-    } else if (url.includes('/home/paineis')) {
-      setActiveItem('paineis');
-    } else if (url.includes('/home/processos')) {
-      setActiveItem('processos');
-    } else if (url.includes('/home/alertas')) {
-      setActiveItem('alertas');
-    } else if (url.includes('/home/admin')) {
-      setActiveItem('admin');
-    } else if (url.includes('/home/settings/language') && !isVibraTenant) {
-      setActiveItem('idiomas');
+  // Update active state when route changes
+  useEffect(() => {
+    if (routeMatch) {
+      setActiveItem(routeMatch.item);
+      if ('subItem' in routeMatch && routeMatch.subItem) {
+        setActiveSubItem(routeMatch.subItem);
+        setOpenDropdown(routeMatch.item);
+      } else {
+        setActiveSubItem(null);
+      }
     } else {
       setActiveItem(null);
+      setActiveSubItem(null);
     }
-  };
+  }, [routeMatch]);
 
   const toggleDropdown = (menu: string) => {
-    if (openDropdown === menu) {
-      setOpenDropdown(null);
-    } else {
-      setOpenDropdown(menu);
-      setActiveItem(menu);
-    }
+    setOpenDropdown(openDropdown === menu ? null : menu);
+    setActiveItem(menu);
   };
 
-  const toggleMenuItem = (item: string) => {
+  const navigateTo = (item: string) => {
     // Block language menu for Vibra tenant
-    if (item === 'idiomas' && isVibraTenant) {
-      return;
-    }
+    if (item === 'idiomas' && isVibraTenant) return;
 
     setActiveItem(item);
     setActiveSubItem(null);
     setOpenDropdown(null);
 
-    if (item === 'genai') {
-      router.push('/genai');
-    } else if (item === 'updates') {
-      router.push('/home/last-updates');
-    } else if (item === 'idiomas') {
-      router.push('/home/settings/language');
+    const route = NAV_ROUTES[item];
+    if (route) {
+      router.push(route);
     }
   };
 
-  const selectSubItem = (parent: string, subItem: string) => {
+  const navigateToSubItem = (parent: string, subItem: string) => {
     setActiveItem(parent);
     setActiveSubItem(subItem);
 
-    if (parent === 'processos' && subItem === 'favoritos') {
-      router.push('/home/processes/favorites');
-    } else if (parent === 'processos' && subItem === 'buscar') {
-      router.push('/home/processes/search');
-    } else if (parent === 'processos' && subItem === 'vetorizacao') {
-      router.push('/home/processes/vectorization-search');
+    const route = SUB_ITEM_ROUTES[parent]?.[subItem];
+    if (route) {
+      router.push(route);
     }
   };
 
@@ -118,7 +128,7 @@ export function PrivateOptions({
         <MenuItem
           icon={Brain}
           isActive={activeItem === 'genai'}
-          onClick={() => toggleMenuItem('genai')}
+          onClick={() => navigateTo('genai')}
         >
           {!isCollapsed && t('menu.private.genAI').toUpperCase()}
         </MenuItem>
@@ -129,7 +139,7 @@ export function PrivateOptions({
         <MenuItem
           icon={Clock}
           isActive={activeItem === 'updates'}
-          onClick={() => toggleMenuItem('updates')}
+          onClick={() => navigateTo('updates')}
         >
           {!isCollapsed && t('menu.private.lastUpdates').toUpperCase()}
         </MenuItem>
@@ -154,7 +164,7 @@ export function PrivateOptions({
                 icon={Star}
                 variant="sub-item"
                 isActive={activeSubItem === 'favoritos'}
-                onClick={() => selectSubItem('processos', 'favoritos')}
+                onClick={() => navigateToSubItem('processos', 'favoritos')}
               >
                 {!isCollapsed && t('menu.private.favorites').toUpperCase()}
               </MenuItem>
@@ -164,7 +174,7 @@ export function PrivateOptions({
                 icon={Search}
                 variant="sub-item"
                 isActive={activeSubItem === 'buscar'}
-                onClick={() => selectSubItem('processos', 'buscar')}
+                onClick={() => navigateToSubItem('processos', 'buscar')}
               >
                 {!isCollapsed && t('menu.private.searchProcesses').toUpperCase()}
               </MenuItem>
@@ -173,7 +183,7 @@ export function PrivateOptions({
               icon={SearchCode}
               variant="sub-item"
               isActive={activeSubItem === 'vetorizacao'}
-              onClick={() => selectSubItem('processos', 'vetorizacao')}
+              onClick={() => navigateToSubItem('processos', 'vetorizacao')}
             >
               {!isCollapsed && t('menu.private.vectorizationSearch').toUpperCase()}
             </MenuItem>
@@ -187,7 +197,7 @@ export function PrivateOptions({
           icon={Languages}
           isActive={activeItem === 'idiomas' && !isVibraTenant}
           disabled={isVibraTenant}
-          onClick={() => toggleMenuItem('idiomas')}
+          onClick={() => navigateTo('idiomas')}
         >
           {!isCollapsed && t('menu.private.languages').toUpperCase()}
         </MenuItem>
@@ -199,7 +209,7 @@ export function PrivateOptions({
           icon={GraduationCap}
           isActive={activeItem === 'training'}
           disabled
-          onClick={() => toggleMenuItem('training')}
+          onClick={() => navigateTo('training')}
         >
           {!isCollapsed && t('menu.private.training').toUpperCase()}
         </MenuItem>
@@ -211,7 +221,7 @@ export function PrivateOptions({
           icon={Shield}
           isActive={activeItem === 'admin'}
           disabled
-          onClick={() => toggleMenuItem('admin')}
+          onClick={() => navigateTo('admin')}
         >
           {!isCollapsed && t('menu.private.admin').toUpperCase()}
         </MenuItem>

@@ -25,6 +25,9 @@ export default function DocsPage() {
         const data = await response.json();
         setSpec(data);
         setIsAuthorized(true);
+        // Note: sessionStorage is used for internal API docs only.
+        // Credentials are cleared on tab close. For public-facing apps,
+        // consider using token-based auth instead.
         sessionStorage.setItem("docs_auth", basicAuth);
       } else {
         setError("Invalid credentials");

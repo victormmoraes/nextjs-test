@@ -9,7 +9,7 @@ import type {
   ChatErrorType,
   UseChatReturn,
   UseChatOptions,
-} from '@/types/chat.types';
+} from '@/types/chat';
 
 /**
  * Hook for managing chat interactions with streaming AI responses.

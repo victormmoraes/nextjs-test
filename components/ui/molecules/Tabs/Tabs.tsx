@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useId } from 'react';
 import { cn } from '@/lib/utils';
 import type { TabsProps } from './Tabs.types';
 
@@ -9,6 +9,7 @@ const INDICATOR_PADDING = 40;
 export function Tabs({ tabs, selectedTab: controlledSelectedTab, onTabChange }: TabsProps) {
   const [internalSelectedTab, setInternalSelectedTab] = useState(tabs[0]?.id || '');
   const selectedTab = controlledSelectedTab ?? internalSelectedTab;
+  const baseId = useId();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -62,27 +63,72 @@ export function Tabs({ tabs, selectedTab: controlledSelectedTab, onTabChange }: 
     return () => resizeObserver.disconnect();
   }, [updateIndicator]);
 
-  const selectTab = (tabId: string) => {
+  const selectTab = (tabId: string, index?: number) => {
     if (onTabChange) {
       onTabChange(tabId);
     } else {
       setInternalSelectedTab(tabId);
     }
+    // Focus the newly selected tab
+    if (index !== undefined) {
+      buttonRefs.current[index]?.focus();
+    }
   };
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent, currentIndex: number) => {
+      let newIndex: number | null = null;
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          newIndex = currentIndex > 0 ? currentIndex - 1 : tabs.length - 1;
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          newIndex = currentIndex < tabs.length - 1 ? currentIndex + 1 : 0;
+          break;
+        case 'Home':
+          e.preventDefault();
+          newIndex = 0;
+          break;
+        case 'End':
+          e.preventDefault();
+          newIndex = tabs.length - 1;
+          break;
+      }
+
+      if (newIndex !== null) {
+        selectTab(tabs[newIndex].id, newIndex);
+      }
+    },
+    [tabs]
+  );
+
   return (
-    <div ref={containerRef} className="flex items-center justify-center gap-12 mb-8 relative">
+    <div
+      ref={containerRef}
+      role="tablist"
+      className="flex items-center justify-center gap-12 mb-8 relative"
+    >
       {tabs.map((tab, index) => (
         <button
           key={tab.id}
           ref={(el) => {
             buttonRefs.current[index] = el;
           }}
+          type="button"
+          role="tab"
+          id={`${baseId}-tab-${tab.id}`}
+          aria-selected={selectedTab === tab.id}
+          aria-controls={`${baseId}-panel-${tab.id}`}
+          tabIndex={selectedTab === tab.id ? 0 : -1}
           className={cn(
             'uppercase text-sm pb-2 transition-colors relative z-10 cursor-pointer',
             selectedTab === tab.id ? 'text-primary-800' : 'text-gray-600 hover:text-primary-800'
           )}
           onClick={() => selectTab(tab.id)}
+          onKeyDown={(e) => handleKeyDown(e, index)}
         >
           {tab.label}
         </button>
@@ -94,6 +140,7 @@ export function Tabs({ tabs, selectedTab: controlledSelectedTab, onTabChange }: 
           width: indicatorStyle.width,
           left: indicatorStyle.left,
         }}
+        aria-hidden="true"
       />
     </div>
   );

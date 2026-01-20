@@ -7,10 +7,10 @@ import { DataTable } from '@/components/ui/organisms/DataTable';
 import { Spinner } from '@/components/ui/atoms/Spinner';
 import { Pagination } from '@/components/ui/molecules/Pagination';
 import type { DataTableColumn } from '@/components/ui/organisms/DataTable';
-import type { ProtocolPresenter } from '@/types/process.types';
+import type { Protocol } from '@prisma/client';
 
 export interface TableProtocolsProps {
-  protocols: ProtocolPresenter[];
+  protocols: Protocol[];
   loading?: boolean;
   onTotalCountChange?: (count: number) => void;
 }
@@ -37,15 +37,15 @@ export function TableProtocols({
     return protocols.slice(start, start + mobileItemsPerPage);
   }, [protocols, mobileCurrentPage]);
 
-  const formatDate = (dateString: string): string => {
-    const d = new Date(dateString);
+  const formatDate = (date: Date | string): string => {
+    const d = typeof date === 'string' ? new Date(date) : date;
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
   };
 
-  const trackById = (row: ProtocolPresenter) => row.id;
+  const trackById = (row: Protocol) => row.id;
 
   // Column definitions
-  const columns: DataTableColumn<ProtocolPresenter>[] = [
+  const columns: DataTableColumn<Protocol>[] = [
     {
       key: 'protocolNumber',
       header: t('tableProtocols.headers.processDocument'),

@@ -1,24 +1,30 @@
-export interface ProcessPresenter {
-  id: string;
-  processNumber: string;
-  lastUpdateDate: string;
-  interestedParties: string[];
-  classificationName: string;
-  generationDate: string;
-  protocolNumber?: string;
-  protocolType?: string;
-  protocolCount?: number;
-  processSummary?: boolean;
-  pdfUrl?: string;
-  isFavorite?: boolean;
-}
+import type { Prisma } from "@prisma/client";
 
-export interface ProcessSummaryPresenter {
-  id: string;
-  processId: string;
-  summaryData?: FiscalizationBaseSummary | FiscalizationFuelQualitySummary | Record<string, unknown>;
-}
+// Process with relations as returned by the API
+export type ProcessWithRelations = Prisma.ProcessGetPayload<{
+  include: {
+    classification: true;
+    tenant: { select: { id: true; name: true } };
+    summary: { select: { id: true } };
+    protocols: {
+      select: { protocolNumber: true; protocolType: true };
+    };
+    _count: { select: { protocols: true } };
+  };
+}>;
 
+// Process with full details (for detail pages)
+export type ProcessWithFullDetails = Prisma.ProcessGetPayload<{
+  include: {
+    classification: true;
+    tenant: { select: { id: true; name: true } };
+    summary: true;
+    onGoingList: true;
+    protocols: true;
+  };
+}>;
+
+// Summary data types for process summaries
 export interface FiscalizationBaseSummary {
   type: 'FiscalizationBase';
   resume?: {
@@ -45,6 +51,8 @@ export interface FiscalizationFuelQualitySummary {
   companyName?: string;
 }
 
+export type SummaryData = FiscalizationBaseSummary | FiscalizationFuelQualitySummary | Record<string, unknown>;
+
 export function isFiscalizationBaseSummary(
   data: unknown
 ): data is FiscalizationBaseSummary {
@@ -59,20 +67,4 @@ export function isFiscalizationFuelQualitySummary(
   if (!data || typeof data !== 'object') return false;
   const d = data as Record<string, unknown>;
   return d.type === 'FiscalizationFuelQuality' || ('summary' in d && 'violation' in d);
-}
-
-export interface OnGoingListPresenter {
-  id: string;
-  onGoingDate: string;
-  onGoingUnit: string;
-  onGoingDescription: string;
-}
-
-export interface ProtocolPresenter {
-  id: string;
-  protocolNumber: string;
-  protocolType?: string;
-  protocolUnit?: string;
-  protocolCreatedAt: string;
-  protocolIncludedAt: string;
 }

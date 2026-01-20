@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useId, useMemo, forwardRef, useImperativeHandle } from 'react';
+import { useState, useRef, useId, useMemo, forwardRef, useImperativeHandle, useCallback } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useClickOutside } from '@/hooks';
@@ -31,9 +31,12 @@ export const InputSelect = forwardRef<InputSelectRef, InputSelectProps>(
   ) => {
     const generatedId = useId();
     const id = providedId || generatedId;
+    const listboxId = `${id}-listbox`;
     const [isOpen, setIsOpen] = useState(false);
+    const [highlightedIndex, setHighlightedIndex] = useState(-1);
     const containerRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
+    const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
     useImperativeHandle(ref, () => ({
       focus: () => buttonRef.current?.focus(),
@@ -41,6 +44,11 @@ export const InputSelect = forwardRef<InputSelectRef, InputSelectProps>(
     }));
 
     useClickOutside(containerRef, () => setIsOpen(false), isOpen);
+
+    const selectedIndex = useMemo(
+      () => options.findIndex((opt) => opt.value === value),
+      [options, value]
+    );
 
     const displayValue = useMemo(() => {
       if (customDisplayValue) {
@@ -53,6 +61,9 @@ export const InputSelect = forwardRef<InputSelectRef, InputSelectProps>(
     const toggleDropdown = () => {
       if (!disabled) {
         setIsOpen((prev) => !prev);
+        if (!isOpen) {
+          setHighlightedIndex(selectedIndex >= 0 ? selectedIndex : 0);
+        }
       }
     };
 
@@ -60,7 +71,61 @@ export const InputSelect = forwardRef<InputSelectRef, InputSelectProps>(
       onChange?.(option.value);
       onBlur?.();
       setIsOpen(false);
+      buttonRef.current?.focus();
     };
+
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent) => {
+        if (disabled) return;
+
+        switch (e.key) {
+          case 'Enter':
+          case ' ':
+            e.preventDefault();
+            if (isOpen && highlightedIndex >= 0) {
+              selectOption(options[highlightedIndex]);
+            } else {
+              toggleDropdown();
+            }
+            break;
+          case 'ArrowDown':
+            e.preventDefault();
+            if (!isOpen) {
+              setIsOpen(true);
+              setHighlightedIndex(selectedIndex >= 0 ? selectedIndex : 0);
+            } else {
+              setHighlightedIndex((prev) =>
+                prev < options.length - 1 ? prev + 1 : prev
+              );
+            }
+            break;
+          case 'ArrowUp':
+            e.preventDefault();
+            if (isOpen) {
+              setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+            }
+            break;
+          case 'Escape':
+            e.preventDefault();
+            setIsOpen(false);
+            buttonRef.current?.focus();
+            break;
+          case 'Home':
+            if (isOpen) {
+              e.preventDefault();
+              setHighlightedIndex(0);
+            }
+            break;
+          case 'End':
+            if (isOpen) {
+              e.preventDefault();
+              setHighlightedIndex(options.length - 1);
+            }
+            break;
+        }
+      },
+      [disabled, isOpen, highlightedIndex, options, selectedIndex]
+    );
 
     return (
       <div className="w-full relative" ref={containerRef}>
@@ -80,6 +145,16 @@ export const InputSelect = forwardRef<InputSelectRef, InputSelectProps>(
             id={id}
             disabled={disabled}
             onClick={toggleDropdown}
+            onKeyDown={handleKeyDown}
+            role="combobox"
+            aria-haspopup="listbox"
+            aria-expanded={isOpen}
+            aria-controls={listboxId}
+            aria-activedescendant={
+              isOpen && highlightedIndex >= 0
+                ? `${id}-option-${highlightedIndex}`
+                : undefined
+            }
             className={cn(
               'block w-full px-3 py-2 pr-10 rounded-sm border border-gray-300',
               'transition-all duration-200 ease-in-out text-left',
@@ -95,20 +170,34 @@ export const InputSelect = forwardRef<InputSelectRef, InputSelectProps>(
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
             <ChevronDown
               className={cn('text-gray-500 w-5 h-5 transition-transform', isOpen && 'rotate-180')}
+              aria-hidden="true"
             />
           </div>
 
           {isOpen && (
-            <div className="absolute z-50 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-auto">
-              {options.map((option) => (
+            <div
+              id={listboxId}
+              role="listbox"
+              aria-label={label || placeholder}
+              className="absolute z-50 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-auto"
+            >
+              {options.map((option, index) => (
                 <button
                   key={option.value}
+                  ref={(el) => {
+                    optionRefs.current[index] = el;
+                  }}
+                  id={`${id}-option-${index}`}
                   type="button"
+                  role="option"
+                  aria-selected={value === option.value}
                   onClick={() => selectOption(option)}
+                  onMouseEnter={() => setHighlightedIndex(index)}
                   className={cn(
                     'w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors',
                     'focus:bg-gray-100 focus:outline-none',
-                    value === option.value && 'bg-primary-50 text-primary-800 font-medium'
+                    value === option.value && 'bg-primary-50 text-primary-800 font-medium',
+                    highlightedIndex === index && 'bg-gray-100'
                   )}
                 >
                   {option.label}

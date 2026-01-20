@@ -31,10 +31,21 @@ export function ProcessNumberCell({
     onProcessClick?.();
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      event.stopPropagation();
+      onProcessClick?.();
+    }
+  };
+
   return (
     <span className="flex items-center gap-2">
       {showFavorite && (
         <button
+          type="button"
+          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          aria-pressed={isFavorite}
           className={cn(
             'p-1 transition-colors',
             isFavorite ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-600'
@@ -42,7 +53,7 @@ export function ProcessNumberCell({
           onClick={handleFavoriteClick}
           data-no-row-click
         >
-          <Star size={16} className={isFavorite ? 'fill-yellow-500' : ''} />
+          <Star size={16} className={isFavorite ? 'fill-yellow-500' : ''} aria-hidden="true" />
         </button>
       )}
       {processLink ? (
@@ -55,13 +66,15 @@ export function ProcessNumberCell({
           {processNumber}
         </Link>
       ) : (
-        <a
-          className="font-medium text-primary-800 hover:text-primary-600 hover:underline cursor-pointer"
+        <button
+          type="button"
+          className="font-medium text-primary-800 hover:text-primary-600 hover:underline cursor-pointer bg-transparent border-none p-0"
           onClick={handleProcessClick}
+          onKeyDown={handleKeyDown}
           data-no-row-click
         >
           {processNumber}
-        </a>
+        </button>
       )}
     </span>
   );

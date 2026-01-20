@@ -14,9 +14,12 @@ export async function GET(request: NextRequest) {
       const classificationId = searchParams.get("classificationId");
       const isFavorite = searchParams.get("isFavorite");
 
-      // Filter by user's tenant unless admin
+      // Filter by user's tenant unless admin or dev override is set
       const isAdmin = user.roles.includes("ADMIN");
-      const tenantId = isAdmin ? undefined : user.tenantId;
+      const devTenantOverride = process.env.DEV_TENANT_ID;
+      const tenantId = devTenantOverride
+        ? (devTenantOverride === "all" ? undefined : parseInt(devTenantOverride))
+        : (isAdmin ? undefined : user.tenantId);
 
       const result = await processService.findAll({
         tenantId,

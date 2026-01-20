@@ -41,6 +41,21 @@ export const processService = {
           tenant: {
             select: { id: true, name: true },
           },
+          summary: {
+            select: { id: true },
+          },
+          protocols: {
+            where: { enabled: true },
+            orderBy: { protocolCreatedAt: "desc" },
+            take: 1,
+            select: {
+              protocolNumber: true,
+              protocolType: true,
+            },
+          },
+          _count: {
+            select: { protocols: true },
+          },
         },
       }),
       prisma.process.count({ where }),

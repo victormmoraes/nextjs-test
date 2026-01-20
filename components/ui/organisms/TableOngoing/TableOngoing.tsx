@@ -7,10 +7,10 @@ import { DataTable } from '@/components/ui/organisms/DataTable';
 import { Spinner } from '@/components/ui/atoms/Spinner';
 import { Pagination } from '@/components/ui/molecules/Pagination';
 import type { DataTableColumn } from '@/components/ui/organisms/DataTable';
-import type { OnGoingListPresenter } from '@/types/process.types';
+import type { OnGoingList } from '@prisma/client';
 
 export interface TableOngoingProps {
-  ongoing: OnGoingListPresenter[];
+  ongoing: OnGoingList[];
   loading?: boolean;
   onTotalCountChange?: (count: number) => void;
 }
@@ -37,17 +37,17 @@ export function TableOngoing({
     return ongoing.slice(start, start + mobileItemsPerPage);
   }, [ongoing, mobileCurrentPage]);
 
-  const formatDateTime = (dateString: string): string => {
-    const d = new Date(dateString);
-    const date = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+  const formatDateTime = (date: Date | string): string => {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    const dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
     const time = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-    return `${date} ${time}`;
+    return `${dateStr} ${time}`;
   };
 
-  const trackById = (row: OnGoingListPresenter) => row.id;
+  const trackById = (row: OnGoingList) => row.id;
 
   // Column definitions
-  const columns: DataTableColumn<OnGoingListPresenter>[] = [
+  const columns: DataTableColumn<OnGoingList>[] = [
     {
       key: 'onGoingDate',
       header: t('tableOngoing.headers.dateTime'),

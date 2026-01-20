@@ -27,7 +27,7 @@ export interface HeaderProps {
 const routeTitleMap: Record<string, string> = {
   '/genai': 'menu.private.genAI',
   '/home/gen-ai': 'menu.private.genAI',
-  '/home/last-updates': 'menu.private.lastUpdates',
+  '/last-updates': 'menu.private.lastUpdates',
   '/home/dashboards': 'menu.private.dashboards',
   '/home/interdictions': 'menu.private.interdictions',
   '/home/conditioners': 'menu.private.conditioners',
@@ -92,21 +92,26 @@ export function Header({
           <div className="flex items-center gap-2 lg:gap-4 flex-1 min-w-0 overflow-hidden">
             {/* Hamburger menu (mobile) */}
             <button
+              type="button"
               onClick={toggleMobile}
+              aria-label="Toggle menu"
               className="lg:hidden p-1.5 hover:bg-gray-100 rounded-lg transition-all duration-200 cursor-pointer shrink-0"
             >
-              <Menu className="w-5 h-5 text-gray-900" />
+              <Menu className="w-5 h-5 text-gray-900" aria-hidden="true" />
             </button>
 
             {/* Sidenav collapse button (desktop) */}
             <button
+              type="button"
               onClick={toggle}
+              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-expanded={!isCollapsed}
               className="hidden lg:block p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 cursor-pointer"
             >
               {isCollapsed ? (
-                <ChevronRight className="w-5 h-5 text-gray-900" />
+                <ChevronRight className="w-5 h-5 text-gray-900" aria-hidden="true" />
               ) : (
-                <ChevronLeft className="w-5 h-5 text-gray-900" />
+                <ChevronLeft className="w-5 h-5 text-gray-900" aria-hidden="true" />
               )}
             </button>
 
@@ -123,6 +128,8 @@ export function Header({
             <div className="flex items-center gap-1.5 lg:gap-3">
               <div className="relative group">
                 <button
+                  type="button"
+                  aria-label="Help"
                   className={cn(
                     'p-1 rounded-lg transition-all duration-200',
                     demoMode
@@ -132,7 +139,7 @@ export function Header({
                   disabled={demoMode}
                   onClick={() => !demoMode && setShowHelpModal(true)}
                 >
-                  <Headset className="w-5 h-5 text-gray-900" />
+                  <Headset className="w-5 h-5 text-gray-900" aria-hidden="true" />
                 </button>
                 {/* Tooltip */}
                 {!demoMode && (
@@ -156,15 +163,20 @@ export function Header({
             <div className="relative" ref={dropdownRef}>
               {demoMode ? (
                 <button
+                  type="button"
                   className="flex items-center gap-1 lg:gap-2 px-2 lg:px-4 py-2 rounded-lg cursor-not-allowed opacity-50"
                   disabled
                 >
                   <span className="text-sm lg:text-md text-gray-900">Demo</span>
-                  <ChevronDown className="w-4 lg:w-5 h-4 lg:h-5 text-gray-900" />
+                  <ChevronDown className="w-4 lg:w-5 h-4 lg:h-5 text-gray-900" aria-hidden="true" />
                 </button>
               ) : (
                 <button
+                  type="button"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  aria-label="User menu"
+                  aria-expanded={isDropdownOpen}
+                  aria-haspopup="menu"
                   className="flex items-center cursor-pointer gap-1 lg:gap-2 px-2 lg:px-4 py-2 hover:bg-gray-100 rounded-lg transition-all duration-200"
                 >
                   <span className="text-sm lg:text-md text-gray-900 max-w-[80px] lg:max-w-none truncate">
@@ -175,18 +187,24 @@ export function Header({
                       'w-4 lg:w-5 h-4 lg:h-5 text-gray-900 transition-transform duration-200',
                       isDropdownOpen && 'rotate-180'
                     )}
+                    aria-hidden="true"
                   />
                 </button>
               )}
 
               {/* Dropdown Menu */}
               {isDropdownOpen && !demoMode && (
-                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50 min-w-full whitespace-nowrap">
+                <div
+                  role="menu"
+                  className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-50 min-w-full whitespace-nowrap"
+                >
                   <button
+                    type="button"
+                    role="menuitem"
                     onClick={handleLogout}
                     className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
                   >
-                    <LogOut className="w-4 h-4 shrink-0" />
+                    <LogOut className="w-4 h-4 shrink-0" aria-hidden="true" />
                     <span>{t('common.logout')}</span>
                   </button>
                 </div>

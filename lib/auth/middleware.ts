@@ -95,3 +95,29 @@ export function getUserFromHeaders(request: NextRequest): JWTPayload | null {
     roles: rolesHeader ? rolesHeader.split(",") : [],
   };
 }
+
+/**
+ * Check if user has access to a resource's tenant.
+ * Considers admin role and DEV_TENANT_ID override.
+ */
+export function hasTenantAccess(
+  user: JWTPayload,
+  resourceTenantId: number | null
+): boolean {
+  // Admins always have access
+  if (user.roles.includes("ADMIN")) {
+    return true;
+  }
+
+  // Dev override: "all" bypasses tenant check, or match specific tenant
+  const devTenantOverride = process.env.DEV_TENANT_ID;
+  if (devTenantOverride === "all") {
+    return true;
+  }
+  if (devTenantOverride && parseInt(devTenantOverride) === resourceTenantId) {
+    return true;
+  }
+
+  // Normal check: user's tenant must match resource's tenant
+  return resourceTenantId === user.tenantId;
+}

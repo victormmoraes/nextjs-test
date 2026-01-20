@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
@@ -23,25 +23,23 @@ import {
   CellActionButton,
 } from '@/components/ui/organisms/DataTable/cells';
 import type { DataTableColumn } from '@/components/ui/organisms/DataTable';
-import type {
-  ProcessPresenter,
-  ProcessSummaryPresenter,
-} from '@/types/process.types';
+import type { ProcessWithRelations } from '@/types/process';
+import type { ProcessSummary } from '@prisma/client';
 import {
   isFiscalizationBaseSummary,
   isFiscalizationFuelQualitySummary,
-} from '@/types/process.types';
+} from '@/types/process';
 
 type SortDirection = 'asc' | 'desc' | null;
 
 export interface TableProcessProps {
-  processes: ProcessPresenter[];
+  processes: ProcessWithRelations[];
   loading?: boolean;
   favoritesOnly?: boolean;
   favoriteProcessIds?: Set<string>;
   onFavoriteToggle?: (processId: string) => void;
   onProcessCountChange?: (count: number) => void;
-  onLoadSummary?: (processId: string) => Promise<ProcessSummaryPresenter | null>;
+  onLoadSummary?: (processId: string) => Promise<ProcessSummary | null>;
 }
 
 export function TableProcess({
@@ -58,7 +56,15 @@ export function TableProcess({
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(false);
-  const [currentSummary, setCurrentSummary] = useState<ProcessSummaryPresenter | null>(null);
+  const [currentSummary, setCurrentSummary] = useState<ProcessSummary | null>(null);
+
+  // Track mounted state to prevent state updates after unmount
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   // Mobile pagination
   const [mobileCurrentPage, setMobileCurrentPage] = useState(1);
@@ -87,8 +93,8 @@ export function TableProcess({
     return sortedProcesses.slice(start, start + mobileItemsPerPage);
   }, [sortedProcesses, mobileCurrentPage]);
 
-  const formatDate = (dateString: string): string => {
-    const d = new Date(dateString);
+  const formatDate = (date: Date | string): string => {
+    const d = typeof date === 'string' ? new Date(date) : date;
     return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
   };
 
@@ -97,25 +103,37 @@ export function TableProcess({
     [favoriteProcessIds]
   );
 
-  const handleFavoriteClick = (process: ProcessPresenter) => {
+  const handleFavoriteClick = (process: ProcessWithRelations) => {
     onFavoriteToggle?.(process.id);
   };
 
-  const handleSummaryClick = async (process: ProcessPresenter) => {
+  const handleSummaryClick = async (process: ProcessWithRelations) => {
     setShowSummaryModal(true);
     setLoadingSummary(true);
     setCurrentSummary(null);
 
     if (onLoadSummary) {
       const summary = await onLoadSummary(process.id);
-      setCurrentSummary(summary);
+      if (mountedRef.current) {
+        setCurrentSummary(summary);
+      }
     }
-    setLoadingSummary(false);
+    if (mountedRef.current) {
+      setLoadingSummary(false);
+    }
   };
 
-  const handleDownloadClick = (process: ProcessPresenter) => {
+  const handleDownloadClick = (process: ProcessWithRelations) => {
     if (process.pdfUrl) {
-      window.open(process.pdfUrl, '_blank');
+      // Validate URL protocol before opening
+      try {
+        const url = new URL(process.pdfUrl, window.location.origin);
+        if (url.protocol === 'http:' || url.protocol === 'https:') {
+          window.open(url.href, '_blank', 'noopener,noreferrer');
+        }
+      } catch {
+        // Invalid URL, ignore
+      }
     }
   };
 
@@ -282,7 +300,7 @@ export function TableProcess({
 
   // Column definitions
   const columns = useMemo(
-    (): DataTableColumn<ProcessPresenter>[] => [
+    (): DataTableColumn<ProcessWithRelations>[] => [
       {
         key: 'processNumber',
         header: t('table.headers.processNumber'),
@@ -321,13 +339,13 @@ export function TableProcess({
         render: (row) => row.interestedParties.join(', '),
       },
       {
-        key: 'classificationName',
+        key: 'classification',
         header: t('table.headers.processType'),
         width: 'w-44',
         align: 'center',
         cellClassName: 'text-secondary',
         render: (row) => (
-          <TruncatedTextCell text={row.classificationName} maxWidth="170px" />
+          <TruncatedTextCell text={row.classification.name} maxWidth="170px" />
         ),
       },
       {
@@ -339,12 +357,12 @@ export function TableProcess({
         render: (row) => formatDate(row.generationDate),
       },
       {
-        key: 'protocolNumber',
+        key: 'protocols',
         header: t('table.headers.protocolNumber'),
         width: 'w-52',
         align: 'center',
         cellClassName: 'text-secondary',
-        render: (row) => row.protocolNumber || '-',
+        render: (row) => row.protocols[0]?.protocolNumber || '-',
       },
       {
         key: 'protocolType',
@@ -352,25 +370,25 @@ export function TableProcess({
         width: 'w-36',
         align: 'center',
         cellClassName: 'text-secondary',
-        render: (row) => row.protocolType || '-',
+        render: (row) => row.protocols[0]?.protocolType || '-',
       },
       {
-        key: 'protocolCount',
+        key: '_count',
         header: t('table.headers.associatedProtocols'),
         width: 'w-48',
         align: 'center',
         cellClassName: 'text-secondary',
-        render: (row) => row.protocolCount?.toString() ?? '-',
+        render: (row) => row._count.protocols > 0 ? row._count.protocols.toString() : '-',
       },
       {
-        key: 'processSummary',
+        key: 'summary',
         header: t('table.headers.regmanagerSummary'),
         width: 'w-48',
         align: 'center',
         render: (row) => (
           <CellActionButton
             icon={FileEdit}
-            disabled={!row.processSummary}
+            disabled={!row.summary}
             onClick={() => handleSummaryClick(row)}
           />
         ),
@@ -401,7 +419,7 @@ export function TableProcess({
       : t('table.noProcessesAvailable'),
   };
 
-  const trackById = (row: ProcessPresenter) => row.id;
+  const trackById = (row: ProcessWithRelations) => row.id;
 
   return (
     <>
@@ -498,10 +516,10 @@ export function TableProcess({
                       </button>
                       <button
                         onClick={() => handleSummaryClick(process)}
-                        disabled={!process.processSummary}
+                        disabled={!process.summary}
                         className={cn(
                           'p-1.5 rounded-lg text-gray-500 hover:text-primary-800 hover:bg-gray-100 transition-colors',
-                          !process.processSummary &&
+                          !process.summary &&
                             'opacity-40 cursor-not-allowed'
                         )}
                       >
@@ -531,7 +549,7 @@ export function TableProcess({
                         {t('table.headers.processType')}
                       </span>
                       <p className="text-gray-900 font-medium truncate mt-0.5">
-                        {process.classificationName || '-'}
+                        {process.classification.name || '-'}
                       </p>
                     </div>
                     <div>
@@ -547,7 +565,7 @@ export function TableProcess({
                         {t('table.headers.protocolNumber')}
                       </span>
                       <p className="text-gray-900 font-medium truncate mt-0.5">
-                        {process.protocolNumber || '-'}
+                        {process.protocols[0]?.protocolNumber || '-'}
                       </p>
                     </div>
                   </div>
@@ -569,13 +587,12 @@ export function TableProcess({
       </div>
 
       {/* Summary Modal */}
-      <Modal
-        isOpen={showSummaryModal}
-        title={t('table.modal.summaryTitle')}
-        hasFooter={false}
-        maxWidth="max-w-4xl"
-        onClose={closeSummaryModal}
-      >
+      {showSummaryModal && (
+        <Modal
+          title={t('table.modal.summaryTitle')}
+          maxWidth="max-w-4xl"
+          onClose={closeSummaryModal}
+        >
         {loadingSummary ? (
           <Spinner type="dots" message={t('table.loadingSummary')} />
         ) : currentSummary ? (
@@ -725,7 +742,8 @@ export function TableProcess({
             {t('processDetails.noSummaryAvailable')}
           </div>
         )}
-      </Modal>
+        </Modal>
+      )}
     </>
   );
 }

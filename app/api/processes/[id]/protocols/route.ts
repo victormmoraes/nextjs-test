@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { protocolService } from "@/services/protocol.service";
 import { processService } from "@/services/process.service";
 import { createProtocolSchema } from "@/lib/validators/protocol";
-import { withAuth } from "@/lib/auth/middleware";
+import { withAuth, hasTenantAccess } from "@/lib/auth/middleware";
 import { successResponse, paginatedResponse, handleError, errorResponse } from "@/lib/utils/response";
 
 type Params = { params: Promise<{ id: string }> };
@@ -15,10 +15,8 @@ export async function GET(request: NextRequest, { params }: Params) {
       const page = parseInt(searchParams.get("page") || "1");
       const pageSize = parseInt(searchParams.get("pageSize") || "50");
 
-      // Check tenant access
       const process = await processService.findById(id);
-      const isAdmin = user.roles.includes("ADMIN");
-      if (!isAdmin && process.tenantId !== user.tenantId) {
+      if (!hasTenantAccess(user, process.tenantId)) {
         return errorResponse("Access denied to this process", 403);
       }
 
@@ -36,10 +34,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     try {
       const { id } = await params;
 
-      // Check tenant access
       const process = await processService.findById(id);
-      const isAdmin = user.roles.includes("ADMIN");
-      if (!isAdmin && process.tenantId !== user.tenantId) {
+      if (!hasTenantAccess(user, process.tenantId)) {
         return errorResponse("Access denied to this process", 403);
       }
 

@@ -1,7 +1,14 @@
-import { ReactNode, ComponentType } from 'react';
+import { ReactNode } from 'react';
 
 export type ColumnAlignment = 'left' | 'center' | 'right';
 export type SortDirection = 'asc' | 'desc' | null;
+
+/**
+ * Component type that accepts any props.
+ * Used for custom header and cell components in DataTable columns.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyComponent = React.ComponentType<any>;
 
 export interface DataTableColumn<T = unknown> {
   key: string;
@@ -11,10 +18,12 @@ export interface DataTableColumn<T = unknown> {
   frozen?: boolean;
   headerClassName?: string;
   cellClassName?: string;
-  headerComponent?: ComponentType<Record<string, unknown>>;
+  /** Custom header component. Use with headerProps to pass props. */
+  headerComponent?: AnyComponent;
   headerProps?: Record<string, unknown>;
   render?: (item: T, index: number) => ReactNode;
-  component?: ComponentType<Record<string, unknown>>;
+  /** Custom cell component. Use with getProps to pass props. */
+  component?: AnyComponent;
   getProps?: (item: T, index: number) => Record<string, unknown>;
 }
 

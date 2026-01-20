@@ -5,3 +5,5 @@ export * from './Pagination';
 export * from './MenuItem';
 export * from './LanguageSelector';
 export * from './InputCalendar';
+export * from './ChatInput';
+export * from './ChatMessageList';

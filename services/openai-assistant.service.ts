@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import type { ChatStreamEvent } from '@/types/chat.types';
+import type { ChatStreamEvent } from '@/types/chat';
 
 // Initialize OpenAI client (only on server-side)
 const getOpenAIClient = () => {

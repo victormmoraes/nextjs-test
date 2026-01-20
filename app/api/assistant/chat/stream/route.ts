@@ -3,7 +3,7 @@ import { verifyToken, type JWTPayload } from '@/lib/auth/jwt';
 import { errorResponse } from '@/lib/utils/response';
 import { openaiAssistantService } from '@/services/openai-assistant.service';
 import { loggingService } from '@/services/logging.service';
-import type { ChatStreamEvent } from '@/types/chat.types';
+import type { ChatStreamEvent } from '@/types/chat';
 
 /**
  * POST /api/assistant/chat/stream
