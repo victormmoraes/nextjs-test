@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
@@ -58,13 +58,6 @@ export function TableProcess({
   const [loadingSummary, setLoadingSummary] = useState(false);
   const [currentSummary, setCurrentSummary] = useState<ProcessSummary | null>(null);
 
-  // Track mounted state to prevent state updates after unmount
-  const mountedRef = useRef(true);
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
 
   // Mobile pagination
   const [mobileCurrentPage, setMobileCurrentPage] = useState(1);
@@ -112,13 +105,14 @@ export function TableProcess({
     setLoadingSummary(true);
     setCurrentSummary(null);
 
-    if (onLoadSummary) {
-      const summary = await onLoadSummary(process.id);
-      if (mountedRef.current) {
+    try {
+      if (onLoadSummary) {
+        const summary = await onLoadSummary(process.id);
         setCurrentSummary(summary);
       }
-    }
-    if (mountedRef.current) {
+    } catch (err) {
+      console.error('Failed to load summary:', err);
+    } finally {
       setLoadingSummary(false);
     }
   };
@@ -309,7 +303,7 @@ export function TableProcess({
         render: (row) => (
           <ProcessNumberCell
             processNumber={row.processNumber}
-            processLink={`/home/processes/details/${row.processNumber}`}
+            processLink={`/processes/details/${row.id}`}
             isFavorite={isFavorite(row.id)}
             showFavorite
             onFavoriteToggle={() => handleFavoriteClick(row)}
@@ -485,7 +479,7 @@ export function TableProcess({
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="flex-1 min-w-0">
                       <Link
-                        href={`/home/processes/details/${process.processNumber}`}
+                        href={`/processes/details/${process.id}`}
                         className="text-sm font-semibold text-primary-800 hover:text-primary-900 hover:underline block truncate"
                       >
                         {process.processNumber}
@@ -526,7 +520,7 @@ export function TableProcess({
                         <FileEdit className="w-4 h-4" />
                       </button>
                       <Link
-                        href={`/home/processes/details/${process.processNumber}`}
+                        href={`/processes/details/${process.id}`}
                         className="p-1.5 rounded-lg text-gray-500 hover:text-primary-800 hover:bg-gray-100 transition-colors"
                       >
                         <ChevronRight className="w-4 h-4" />

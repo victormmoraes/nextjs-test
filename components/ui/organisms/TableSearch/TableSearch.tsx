@@ -89,7 +89,7 @@ export function TableSearch({
         render: (row) => (
           <ProcessNumberCell
             processNumber={row.processNumber}
-            processLink={`/home/processes/details/${row.processNumber}`}
+            processLink={`/processes/details/${row.id}`}
           />
         ),
       },
@@ -135,7 +135,7 @@ export function TableSearch({
         render: (row) => (
           <CellTextButton
             text={t('common.view')}
-            href={`/home/processes/details/${row.processNumber}`}
+            href={`/processes/details/${row.id}`}
           />
         ),
       },
@@ -195,7 +195,7 @@ export function TableSearch({
               {paginatedMobileData.map((process) => (
                 <Link
                   key={process.id}
-                  href={`/home/processes/details/${process.processNumber}`}
+                  href={`/processes/details/${process.id}`}
                   className="block p-4 hover:bg-gray-50 transition-colors"
                 >
                   {/* Header: Process Number */}

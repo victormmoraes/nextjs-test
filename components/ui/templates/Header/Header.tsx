@@ -67,7 +67,7 @@ export function Header({
     const route = pathname.split('?')[0];
 
     // Check for dynamic process details route
-    if (route.startsWith('/home/processes/details/')) {
+    if (route.startsWith('/processes/details/')) {
       return t('menu.private.processDetails');
     }
 
