@@ -1,0 +1,285 @@
+{
+  "app": {
+    "name": "RegManager",
+    "title": "Registration Manager"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in to your account",
+      "email": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "signIn": "Sign in",
+      "signingIn": "Signing in...",
+      "needHelp": "Need help signing in?",
+      "error": "Invalid email or password. Please try again.",
+      "timeout": "Connection timed out. Please try again.",
+      "networkError": "Connection error. Check your internet and try again.",
+      "serverError": "Server error. Please try again later.",
+      "helpModal": {
+        "title": "Problems accessing?",
+        "message": "Contact support:",
+        "close": "Close"
+      }
+    },
+    "invalidTenant": {
+      "title": "Invalid Tenant",
+      "message": "The tenant specified in the URL is not valid or does not exist.",
+      "help": "Please contact your administrator or use a valid tenant URL.",
+      "goHome": "Go to Home"
+    }
+  },
+  "menu": {
+    "private": {
+      "genAI": "AI RegManager",
+      "lastUpdates": "Last Updates",
+      "dashboards": "Dashboards",
+      "interdictions": "Interdictions",
+      "conditioners": "Conditioners",
+      "processes": "Processes",
+      "favorites": "Favorites",
+      "searchProcesses": "Search Processes",
+      "vectorizationSearch": "Contextual Search",
+      "processDetails": "Process Details",
+      "alerts": "Alerts",
+      "createAlerts": "Create Alerts",
+      "manageAlerts": "Manage Alerts",
+      "admin": "Admin",
+      "training": "Training",
+      "languages": "Languages",
+      "portuguese": "Portuguese",
+      "english": "English",
+      "languageExample": "Example: This message changes with the language!"
+    },
+    "public": {
+      "publicProcesses": "Public Processes",
+      "subscribe": "Subscribe",
+      "monitoredProcesses": "Monitored Processes",
+      "searchProcesses": "Search Processes"
+    }
+  },
+  "contextualSearch": {
+    "title": "Contextual Search",
+    "description1": "Contextual Search is a feature that uses RegManager's AI to find processes based on the context of what you're looking for, not just keywords.",
+    "description2": "For example: \"processes related to platform inspections\" or \"documents about operational safety\".",
+    "description3": "The system analyzes the content of processes and returns the most relevant results according to the context of your search, providing a more intuitive and efficient experience."
+  },
+  "language": {
+    "title": "Language Settings",
+    "description": "This is the system language configuration area. By selecting one of the options below, the entire RegManager interface will be automatically translated to your chosen language, including menus, buttons, messages, and other text elements. The change is applied instantly and your preference will be saved for future sessions."
+  },
+  "common": {
+    "poweredBy": "Powered by",
+    "terms": "Terms",
+    "privacy": "Privacy Policy",
+    "agreement": "By signing in, you agree to our",
+    "and": "and",
+    "support": "Support",
+    "logout": "Logout",
+    "warning": "Notice",
+    "understood": "Got it",
+    "selectLanguage": "The platform is available in PT and EN. Select your preferred language.",
+    "view": "View",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back"
+  },
+  "genai": {
+    "title": "Regulatory Data Enhanced by GenAI and Automation",
+    "initialTitle": "How can RegManager help you?",
+    "modal_text": "You are interacting with the test version of RegManager's Generative AI. The answers are automatic and based on processed documents. This test version has performance and response time limitations.<br><br>Currently, 12 processes from the Inspection: Interdiction category are available for queries through this AI:<br><ul class=\"list-disc pl-5 mt-2\"><li>48610.200270/2025-23 - Petrobras (West Tellus)</li><li>48610.201628/2025-35 - Petroreconcavo (Miranga)</li><li>48610.202573/2025-81 - Petrobras (SPM - 14)</li><li>48610.204217/2025-00 - Petrobras (FPSO ADR)</li><li>48610.204494/2025-12 - Equinor (Valaris)</li><li>48610.206752/2025-97 - Petrobras (PCH 2)</li><li>48610.208052/2025-37 - PRIO Bravo (Polvo A)</li><li>48610.209658/2025-90 - Petrobras (P-53)</li><li>48610.227536/2025-85 - Petrobras (NS Tidal Action)</li><li>48610.219566/2025-18 - PRIO Jaguar (Hunter Queen)</li><li>48610.221768/2025-20 - Equinor (FPSO Peregrino)</li><li>48610.227416/2025-88 - 3R Potiguar (109 installations)</li></ul>",
+    "modal_text_tenant3": "You are interacting with the test version of RegManager's Generative AI. The answers are automatic and based on processed documents. This test version has performance and response time limitations.<br><br>Currently, 5 processes from the Inspection: Fuel Supply, Production of Fuels and Biofuels Facilities category are available for queries through this AI:<br><ul class=\"list-disc pl-5 mt-2\"><li>48640.200585/2025-13 - Vibra (Posto Ferrpaol Ltda)</li><li>48640.200586/2025-68 - Vibra (Auto Posto Ferreira e Levenhagem Ltda.)</li><li>48620.201339/2025-17 - Vibra (Auto Posto Frango Japa Ltda.)</li><li>48620.201396/2025-04 - Vibra (Posto São Sebastião)</li><li>48640.200037/2025-93 - Vibra (Posto da Gruta Ltda)</li></ul>",
+    "placeholder": "Send a message to RegManager's AI",
+    "test_version": "You are using the test version of RegManager's Generative AI. GenAI responses are only available for processes in the \"Last Updates\" tab. This version has performance and response time limitations.",
+    "test_version_public": "You are using the test version of RegManager's Generative AI. This version has performance and response time limitations.",
+    "disclaimer": "RegManager AI may make mistakes. Please verify important information.",
+    "sources": "Sources",
+    "page": "Page",
+    "newChat": "Start new conversation",
+    "retry": "Try again",
+    "errors": {
+      "network": "Unable to connect to the AI service. Please check your internet connection and try again.",
+      "timeout": "The request took too long to complete. Please try again with a shorter question.",
+      "serviceUnavailable": "The AI service is temporarily unavailable. Please try again in a few moments.",
+      "server": "An error occurred while processing your request. Please try again.",
+      "badRequest": "Unable to process your message. Please rephrase and try again.",
+      "unknown": "An unexpected error occurred. Please try again."
+    },
+    "chatHistory": {
+      "title": "Chat History",
+      "loadingHistory": "Loading conversation history...",
+      "noThreadsFound": "No conversations found",
+      "noThreadsMessage": "Start a new conversation to see your chat history here.",
+      "loadError": "Failed to load chat history. Please try again.",
+      "continueConversation": "Continue this conversation",
+      "messageCount": "messages",
+      "threadDate": "Started on",
+      "viewThread": "View conversation"
+    }
+  },
+  "table": {
+    "loading": "Loading processes...",
+    "loadingProcesses": "Loading processes...",
+    "searching": "Searching processes...",
+    "loadingSummary": "Loading summary...",
+    "viewSummary": "View Summary",
+    "toggleFavorite": "Toggle favorite",
+    "noProcessesFound": "No processes found",
+    "noProcessesAvailable": "Search another date to find processes.",
+    "noProcessesWithFilters": "No processes found with the applied filters.",
+    "noFavorites": "No favorites",
+    "noFavoritesMessage": "You don't have any favorite processes yet.",
+    "newestFirst": "Newest first",
+    "oldestFirst": "Oldest first",
+    "headers": {
+      "processes": "Processes",
+      "processNumber": "Process Number",
+      "lastUpdate": "Last Update",
+      "interested": "Interested",
+      "processType": "Process Type",
+      "generationDate": "Generation Date",
+      "date": "Date",
+      "inclusionDate": "Inclusion Date",
+      "protocolNumber": "Protocol Number",
+      "protocolType": "Protocol Type",
+      "associatedProtocols": "Protocol Count",
+      "regmanagerSummary": "RegManager Summary",
+      "download": "Download"
+    },
+    "modal": {
+      "summaryTitle": "Overview"
+    },
+    "sort": {
+      "oldest": "Oldest",
+      "newest": "Newest"
+    }
+  },
+  "filters": {
+    "period": "Period",
+    "periodOptions": {
+      "last7days": "Last 7 days",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "custom": "Custom"
+    },
+    "startDate": "Start date",
+    "endDate": "End date",
+    "startDatePlaceholder": "Select start date",
+    "endDatePlaceholder": "Select end date"
+  },
+  "lastUpdates": {
+    "lastUpdateLabel": "RegManager Last Update:"
+  },
+  "calendar": {
+    "daysOfWeek": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "months": [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ],
+    "clear": "Clear",
+    "close": "Close"
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search by Number, Process Type or Interested Parties",
+    "startDate": "Start",
+    "endDate": "End",
+    "results": "Search Results"
+  },
+  "vectorizationSearch": {
+    "title": "Contextual Search",
+    "placeholder": "Describe what you're looking for...",
+    "results": "Search Results",
+    "searching": "Searching processes...",
+    "noResults": "No results found for your search.",
+    "processFound": "Process Summary:",
+    "relatedExcerpt": "Related Excerpt:",
+    "viewFullProcess": "VIEW PROCESS",
+    "aiSummary": "Justification:"
+  },
+  "processDetails": {
+    "title": "Process Details",
+    "loading": "Loading details...",
+    "back": "Back",
+    "backToProcesses": "BACK TO PROCESSES",
+    "download": "DOWNLOAD",
+    "processNumber": "Process Number:",
+    "interested": "Interested:",
+    "type": "Type:",
+    "generationDate": "Generation Date:",
+    "lastUpdate": "Last Update:",
+    "regmanagerSummary": "RegManager Summary",
+    "citedEmails": "Cited emails:",
+    "protocols": "Protocols",
+    "progress": "Progress",
+    "mainInfo": "Main Information",
+    "protocolInfo": "Protocol Information",
+    "summary": "Summary and Notes",
+    "actions": "Actions",
+    "downloadProcess": "Download Process",
+    "viewHistory": "View History",
+    "notFound": "Process not found",
+    "notFoundMessage": "The process you are looking for does not exist or has been removed.",
+    "backToList": "Back to list",
+    "noSummaryAvailable": "Summary not available for this process.",
+    "citedCompanies": "Cited companies:",
+    "basinsFieldsPlatforms": "Basins, fields, platforms, vessels, wells and coordinates:",
+    "relatedActivities": "Related activities:",
+    "equipmentsAndSystems": "Cited equipment and systems:",
+    "violation": "Violation",
+    "violationDetails": "Violation Details",
+    "violationType": "Violation Type:",
+    "substances": "Substances:",
+    "measurementAnalysis": "Measurement Analysis",
+    "expectedRange": "Expected Range:",
+    "measuredRange": "Calculated Range:",
+    "cnpj": "CNPJ",
+    "cnpjs": "CNPJs:",
+    "companyNames": "Company Names:",
+    "processDetailsSection": "Process Details",
+    "defenseInfo": "Defense Information",
+    "defenseSubmitted": "Defense submitted?:",
+    "defenseDate": "Defense Date:",
+    "inspectionDate": "Inspection Date:"
+  },
+  "tabs": {
+    "overview": "OVERVIEW",
+    "protocols": "PROTOCOLS",
+    "progress": "PROGRESS"
+  },
+  "tableProtocols": {
+    "loading": "Loading protocols...",
+    "noProtocolsFound": "No protocols found",
+    "noProtocolsAvailable": "No protocols available at this time.",
+    "headers": {
+      "processDocument": "Process/Document",
+      "type": "Type",
+      "date": "Date",
+      "inclusionDate": "Inclusion Date",
+      "unit": "Unit"
+    }
+  },
+  "tableOngoing": {
+    "loading": "Loading progress...",
+    "noOngoingFound": "No progress found",
+    "noOngoingAvailable": "No progress available at this time.",
+    "headers": {
+      "dateTime": "Date/Time",
+      "unit": "Unit",
+      "description": "Description"
+    }
+  },
+  "pagination": {
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "results": "results"
+  }
+}

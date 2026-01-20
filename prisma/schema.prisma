@@ -1,0 +1,293 @@
+// Prisma Schema for RegManager
+// Migrated from Spring Boot Domain Model
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum InteractionType {
+  CHAT_MESSAGE
+  THREAD_CREATED
+  PROCESS_VIEW
+  PROCESS_SEARCH
+  DOCUMENT_DOWNLOAD
+  LOGIN
+  LOGOUT
+  OTHER
+}
+
+// =============================================================================
+// CORE ENTITIES
+// =============================================================================
+
+model Tenant {
+  id         Int     @id @default(autoincrement())
+  name       String
+  tenantLogo String? @map("tenant_logo")
+
+  // Audit fields (from BaseEntity)
+  enabled   Boolean  @default(true)
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  users               User[]
+  processes           Process[]
+  userInteractionLogs UserInteractionLog[]
+  userAccessLogs      UserAccessLog[]
+
+  @@map("tenants")
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  tenantId       Int       @map("tenant_id")
+  name           String
+  email          String    @unique
+  password       String
+  lastLoggedInAt DateTime? @map("last_logged_in_at")
+
+  // Audit fields (from BaseEntity)
+  enabled   Boolean  @default(true)
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  tenant              Tenant               @relation(fields: [tenantId], references: [id])
+  roles               UserRole[]
+  refreshTokens       RefreshToken[]
+  userInteractionLogs UserInteractionLog[]
+  userAccessLogs      UserAccessLog[]
+
+  @@map("users")
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  // Relations (no audit fields per original spec)
+  users UserRole[]
+
+  @@map("roles")
+}
+
+// Explicit join table for User-Role many-to-many
+model UserRole {
+  userId Int @map("user_id")
+  roleId Int @map("role_id")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+// =============================================================================
+// PROCESS ENTITIES
+// =============================================================================
+
+model Process {
+  id                String   @id @default(uuid()) @db.Uuid
+  processNumber     String   @map("process_number")
+  classificationId  Int      @map("classification_id")
+  tenantId          Int?     @map("tenant_id")
+  generationDate    DateTime @map("generation_date")
+  lastUpdateDate    DateTime @map("last_update_date")
+  interestedParties String[] @map("interested_parties")
+  pdfUrl            String   @map("pdf_url")
+  isFavorite        Boolean  @default(false) @map("is_favorite")
+
+  // Audit fields (from BaseEntity)
+  enabled   Boolean  @default(true)
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  classification ProcessClassification @relation(fields: [classificationId], references: [id])
+  tenant         Tenant?               @relation(fields: [tenantId], references: [id])
+  summary        ProcessSummary?
+  onGoingList    OnGoingList[]
+  protocols      Protocol[]
+
+  @@map("process")
+}
+
+model ProcessClassification {
+  id           Int    @id @default(autoincrement())
+  name         String
+  abbreviation String @unique
+  category     String
+  subCategory  String @map("sub_category")
+
+  // Audit fields (from BaseEntity)
+  enabled   Boolean  @default(true)
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  processes Process[]
+
+  @@map("process_classification")
+}
+
+model ProcessSummary {
+  id               String    @id @default(uuid()) @db.Uuid
+  processId        String    @unique @map("process_id") @db.Uuid
+  summaryData      Json      @map("summary_data") @db.JsonB
+  lastSummarizedAt DateTime? @map("last_summarized_at")
+
+  // Audit fields (from BaseEntity)
+  enabled   Boolean  @default(true)
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  @@map("process_summary")
+}
+
+model OnGoingList {
+  id                 String   @id @default(uuid()) @db.Uuid
+  processId          String   @map("process_id") @db.Uuid
+  onGoingDate        DateTime @map("on_going_date")
+  onGoingUnit        String   @map("on_going_unit")
+  onGoingDescription String   @map("on_going_description")
+
+  // Audit fields (from BaseEntity)
+  enabled   Boolean  @default(true)
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  @@map("on_going_list")
+}
+
+model Protocol {
+  id                 String   @id @default(uuid()) @db.Uuid
+  processId          String   @map("process_id") @db.Uuid
+  protocolNumber     String   @map("protocol_number")
+  protocolType       String   @map("protocol_type")
+  protocolUnit       String   @map("protocol_unit")
+  protocolCreatedAt  DateTime @map("protocol_created_at")
+  protocolIncludedAt DateTime @map("protocol_included_at")
+
+  // Audit fields (from BaseEntity)
+  enabled   Boolean  @default(true)
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  @@map("protocols")
+}
+
+// =============================================================================
+// AUTHENTICATION
+// =============================================================================
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique @db.VarChar(512)
+  userId    Int      @map("user_id")
+  expiry    DateTime
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations (no full audit fields per original spec)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// =============================================================================
+// LOGGING ENTITIES
+// =============================================================================
+
+model UserInteractionLog {
+  id                Int             @id @default(autoincrement())
+  userId            Int             @map("user_id")
+  tenantId          Int             @map("tenant_id")
+  interactionType   InteractionType @map("interaction_type")
+  threadId          String?         @map("thread_id")
+  runId             String?         @map("run_id")
+  userMessage       String?         @map("user_message") @db.Text
+  assistantResponse String?         @map("assistant_response") @db.Text
+  metadata          String?         @db.Text
+  status            String?         @db.VarChar(50)
+  tokensUsed        Int?            @map("tokens_used")
+  responseTimeMs    BigInt?         @map("response_time_ms")
+  ipAddress         String?         @map("ip_address") @db.VarChar(45)
+  userAgent         String?         @map("user_agent") @db.Text
+
+  // Audit fields (from BaseEntity)
+  enabled   Boolean  @default(true)
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("user_interaction_logs")
+}
+
+model UserAccessLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  tenantId   Int      @map("tenant_id")
+  ipAddress  String?  @map("ip_address") @db.VarChar(45)
+  userAgent  String?  @map("user_agent") @db.Text
+  loggedInAt DateTime @map("logged_in_at")
+
+  // Audit fields (from BaseEntity)
+  enabled   Boolean  @default(true)
+  createdBy String?  @map("created_by")
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user   User   @relation(fields: [userId], references: [id])
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("user_access_logs")
+}
+
+model DailyBotLog {
+  id              Int      @id @default(autoincrement())
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  numberOfUpdates Int      @default(0) @map("number_of_updates")
+
+  @@map("daily_bot_logs")
+}

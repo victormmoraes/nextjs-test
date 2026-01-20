@@ -1,26 +1,288 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Primary Colors */
+  --color-primary-50: #ebf9f9;
+  --color-primary-100: #9dd1d4;
+  --color-primary-200: #68dbd5;
+  --color-primary-400: #2ca9a4;
+  --color-primary-500: #35afb0;
+  --color-primary-600: #3c8c90;
+  --color-primary-700: #007975;
+  --color-primary-800: #184c4f;
+  --color-primary-900: #1d6262;
+  --color-primary-950: #0c2727;
+
+  /* Accent Colors */
+  --color-accent-50: #fffef5;
+  --color-accent-100: #ffffaf;
+  --color-accent-200: #fff9e6;
+  --color-accent-400: #f6d27e;
+  --color-accent-500: #f2c80f;
+  --color-accent-600: #ffbf00;
+  --color-accent-700: #c1a150;
+
+  /* Error Colors */
+  --color-error-50: #fff1f0;
+  --color-error-100: #ffe3e3;
+  --color-error-500: #fd625e;
+  --color-error-600: #b80006;
+  --color-error-700: #b00020;
+  --color-error-900: #650a0a;
+
+  /* Success Colors */
+  --color-success-500: #37cc5c;
+  --color-success-600: #018786;
+
+  /* Gray Colors */
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f4f4f4;
+  --color-gray-200: #f2f2f2;
+  --color-gray-300: #e0e0e0;
+  --color-gray-400: #c4c4c4;
+  --color-gray-500: #a2aaad;
+  --color-gray-600: #999999;
+  --color-gray-700: #808080;
+  --color-gray-800: #595959;
+  --color-gray-900: #343a40;
+  --color-gray-950: #212426;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 1rem;
+
+  /* Spacing */
+  --spacing-gutter: 1.5rem;
+  --spacing-margin: 1.5rem;
+  --spacing-padding: 1rem;
+
+  /* Font Family */
+  --font-sans: Roboto, 'Helvetica Neue', sans-serif;
+  --font-body: Roboto, 'Helvetica Neue', sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html,
+body {
+  font-family: var(--font-body);
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+}
+
+/* Ensure all elements inherit the font family */
+*,
+*::before,
+*::after {
+  font-family: inherit;
+}
+
+/* Override browser defaults for form elements */
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: var(--font-body);
+}
+
+.text-primary {
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.text-secondary {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.text-tertiary {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.text-disabled {
+  color: rgba(0, 0, 0, 0.38);
+}
+
+.bg-hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.bg-selected {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.shadow-1 {
+  box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-2 {
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-4 {
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 10px 0px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-8 {
+  box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14),
+    0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.transition-all {
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes modalOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-0.5rem);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-in {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+.animate-modal {
+  animation-name: modalIn;
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.animate-out {
+  animation-duration: 150ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.fade-out {
+  animation-name: fadeOut;
+}
+
+.modal-out {
+  animation-name: modalOut;
+}
+
+.animate-slide-in-right {
+  animation-name: slideInRight;
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.animate-slide-in-left {
+  animation-name: slideInLeft;
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 200ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-in,
+  .animate-out,
+  .animate-modal,
+  .fade-in,
+  .fade-out,
+  .modal-out,
+  .animate-slide-in-right,
+  .animate-slide-in-left {
+    animation: none !important;
+  }
+
+  .backdrop-blur-sm {
+    backdrop-filter: none !important;
+  }
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
 }

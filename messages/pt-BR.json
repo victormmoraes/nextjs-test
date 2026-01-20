@@ -1,0 +1,281 @@
+{
+  "app": {
+    "name": "RegManager",
+    "title": "Gerenciador de Registros"
+  },
+  "auth": {
+    "login": {
+      "title": "Entre na sua conta",
+      "email": "Endereço de e-mail",
+      "emailPlaceholder": "voce@exemplo.com.br",
+      "emailRequired": "E-mail é obrigatório",
+      "emailInvalid": "Por favor, insira um endereço de e-mail válido",
+      "password": "Senha",
+      "passwordPlaceholder": "••••••••",
+      "passwordRequired": "Senha é obrigatória",
+      "passwordMinLength": "A senha deve ter pelo menos 6 caracteres",
+      "rememberMe": "Lembrar-me",
+      "forgotPassword": "Esqueceu a senha?",
+      "signIn": "Entrar",
+      "signingIn": "Entrando...",
+      "needHelp": "Precisa de ajuda para entrar?",
+      "error": "E-mail ou senha inválidos. Por favor, tente novamente.",
+      "timeout": "A conexão expirou. Por favor, tente novamente.",
+      "networkError": "Erro de conexão. Verifique sua internet e tente novamente.",
+      "serverError": "Erro no servidor. Por favor, tente novamente mais tarde.",
+      "helpModal": {
+        "title": "Problemas no acesso?",
+        "message": "Fale com o suporte:",
+        "close": "Fechar"
+      }
+    },
+    "invalidTenant": {
+      "title": "Tenant Inválido",
+      "message": "O tenant especificado na URL não é válido ou não existe.",
+      "help": "Por favor, entre em contato com o administrador ou use uma URL de tenant válida.",
+      "goHome": "Ir para Início"
+    }
+  },
+  "menu": {
+    "private": {
+      "genAI": "IA RegManager",
+      "lastUpdates": "Últimas Atualizações",
+      "dashboards": "Painéis",
+      "interdictions": "Interdições",
+      "conditioners": "Condicionantes",
+      "processes": "Processos",
+      "favorites": "Favoritos",
+      "searchProcesses": "Buscar Processos",
+      "vectorizationSearch": "Busca Contextual",
+      "processDetails": "Detalhamentos do Processo",
+      "alerts": "Alertas",
+      "createAlerts": "Criação Alertas",
+      "manageAlerts": "Gestão Alertas",
+      "admin": "Admin",
+      "training": "Treinamento",
+      "languages": "Idiomas",
+      "portuguese": "Português",
+      "english": "Inglês",
+      "languageExample": "Exemplo: Esta mensagem muda com o idioma!"
+    },
+    "public": {
+      "publicProcesses": "Processos Públicos",
+      "subscribe": "Inscreva-se",
+      "monitoredProcesses": "Processos Monitorados",
+      "searchProcesses": "Buscar Processos"
+    }
+  },
+  "contextualSearch": {
+    "title": "Busca Contextual",
+    "description1": "A Busca Contextual é uma funcionalidade que utiliza a IA do RegManager para encontrar processos baseando-se no contexto do que você está procurando, e não apenas em palavras-chave.",
+    "description2": "Por exemplo: \"processos relacionados a fiscalização de plataformas\" ou \"documentos sobre segurança operacional\".",
+    "description3": "O sistema analisa o conteúdo dos processos e retorna os resultados mais relevantes de acordo com o contexto da sua busca, proporcionando uma experiência mais intuitiva e eficiente."
+  },
+  "language": {
+    "title": "Configurações de Idioma",
+    "description": "Esta é a área de configuração de idioma do sistema. Ao selecionar uma das opções abaixo, toda a interface do RegManager será automaticamente traduzida para o idioma escolhido, incluindo menus, botões, mensagens e demais elementos textuais. A alteração é aplicada instantaneamente e sua preferência será salva para as próximas sessões."
+  },
+  "common": {
+    "poweredBy": "Desenvolvido por",
+    "terms": "Termos",
+    "privacy": "Política de Privacidade",
+    "agreement": "Ao entrar, você concorda com nossos",
+    "and": "e",
+    "support": "Suporte",
+    "logout": "Sair",
+    "warning": "Aviso",
+    "understood": "Entendi",
+    "selectLanguage": "A plataforma está disponivel PT e EN. Selecione o idioma de sua preferência.",
+    "view": "Ver",
+    "yes": "Sim",
+    "no": "Não",
+    "back": "Voltar"
+  },
+  "genai": {
+    "title": "Dados Regulatórios Potencializados Por GenAI e Automação",
+    "initialTitle": "Como o RegManager pode te ajudar?",
+    "modal_text": "Você está interagindo com a versão de testes da IA Generativa do RegManager. As respostas são automáticas e baseadas em documentos processados. Esta versão de testes possui limitações de performance e tempo de resposta.<br><br>Neste momento, estão disponíveis 12 processos da categoria Fiscalização: Interdição para consultas através desta IA:<br><ul class=\"list-disc pl-5 mt-2\"><li>48610.200270/2025-23 - Petrobras (West Tellus)</li><li>48610.201628/2025-35 - Petroreconcavo (Miranga)</li><li>48610.202573/2025-81 - Petrobras (SPM - 14)</li><li>48610.204217/2025-00 - Petrobras (FPSO ADR)</li><li>48610.204494/2025-12 - Equinor (Valaris)</li><li>48610.206752/2025-97 - Petrobras (PCH 2)</li><li>48610.208052/2025-37 - PRIO Bravo (Polvo A)</li><li>48610.209658/2025-90 - Petrobras (P-53)</li><li>48610.227536/2025-85 - Petrobras (NS Tidal Action)</li><li>48610.219566/2025-18 - PRIO Jaguar (Hunter Queen)</li><li>48610.221768/2025-20 - Equinor (FPSO Peregrino)</li><li>48610.227416/2025-88 - 3R Potiguar (109 instalações)</li></ul>",
+    "modal_text_tenant3": "Você está interagindo com a versão de testes da IA Generativa do RegManager. As respostas são automáticas e baseadas em documentos processados. Esta versão de testes possui limitações de performance e tempo de resposta.<br><br>Neste momento, estão disponíveis 5 processos da categoria Fiscalização: Instalações de Abastecimento, de Produção de Combustíveis e de Biocombustíveis para consultas através desta IA:<br><ul class=\"list-disc pl-5 mt-2\"><li>48640.200585/2025-13 - Vibra (Posto Ferrpaol Ltda)</li><li>48640.200586/2025-68 - Vibra (Auto Posto Ferreira e Levenhagem Ltda.)</li><li>48620.201339/2025-17 - Vibra (Auto Posto Frango Japa Ltda.)</li><li>48620.201396/2025-04 - Vibra (Posto São Sebastião)</li><li>48640.200037/2025-93 - Vibra (Posto da Gruta Ltda)</li></ul>",
+    "placeholder": "Enviar uma mensagem para IA do RegManager",
+    "test_version": "Você está utilizando a versão de testes da IA Generativa do RegManager. As respostas da IA RegManager estão disponíveis apenas para os processos disponíveis na aba \"Últimas Atualizações\". Esta versão possui limitações de desempenho e tempo de resposta.",
+    "test_version_public": "Você está utilizando a versão de testes da IA Generativa do RegManager. Esta versão possui limitações de desempenho e tempo de resposta.",
+    "disclaimer": "RegManager AI pode cometer erros. Verifique informações importantes.",
+    "sources": "Fontes",
+    "page": "Página",
+    "newChat": "Iniciar nova conversa",
+    "retry": "Tentar novamente",
+    "errors": {
+      "network": "Não foi possível conectar ao serviço de IA. Verifique sua conexão com a internet e tente novamente.",
+      "timeout": "A solicitação demorou muito para ser concluída. Tente novamente com uma pergunta mais curta.",
+      "serviceUnavailable": "O serviço de IA está temporariamente indisponível. Tente novamente em alguns instantes.",
+      "server": "Ocorreu um erro ao processar sua solicitação. Tente novamente.",
+      "badRequest": "Não foi possível processar sua mensagem. Reformule e tente novamente.",
+      "unknown": "Ocorreu um erro inesperado. Tente novamente."
+    },
+    "chatHistory": {
+      "title": "Histórico de Conversas",
+      "loadingHistory": "Carregando histórico de conversas...",
+      "noThreadsFound": "Nenhuma conversa encontrada",
+      "noThreadsMessage": "Inicie uma nova conversa para ver seu histórico aqui.",
+      "loadError": "Falha ao carregar histórico. Tente novamente.",
+      "continueConversation": "Continuar esta conversa",
+      "messageCount": "mensagens",
+      "threadDate": "Iniciada em",
+      "viewThread": "Ver conversa"
+    }
+  },
+  "table": {
+    "loading": "Carregando processos...",
+    "loadingProcesses": "Carregando processos...",
+    "searching": "Buscando processos...",
+    "loadingSummary": "Carregando resumo...",
+    "viewSummary": "Ver Resumo",
+    "toggleFavorite": "Marcar/Desmarcar como favorito",
+    "noProcessesFound": "Nenhum processo encontrado",
+    "noProcessesAvailable": "Pesquise outra data para encontrar processos.",
+    "noProcessesWithFilters": "Não foram encontrados processos com os filtros aplicados.",
+    "noFavorites": "Nenhum favorito",
+    "noFavoritesMessage": "Você ainda não tem processos favoritados.",
+    "newestFirst": "Mais recente",
+    "oldestFirst": "Mais antigo",
+    "headers": {
+      "processes": "Processos",
+      "processNumber": "Nº do Processo",
+      "lastUpdate": "Últ. Atualização",
+      "interested": "Interessados",
+      "processType": "Tipo Processo",
+      "generationDate": "Data de Geração",
+      "date": "Data",
+      "inclusionDate": "Data de Inclusão",
+      "protocolNumber": "Nº Protocolo",
+      "protocolType": "Tipo Protocolo",
+      "associatedProtocols": "Nº Protocolos Associados",
+      "regmanagerSummary": "Resumo RegManager",
+      "download": "Download"
+    },
+    "modal": {
+      "summaryTitle": "Visão Geral"
+    },
+    "sort": {
+      "oldest": "Mais antigo",
+      "newest": "Mais recente"
+    }
+  },
+  "filters": {
+    "period": "Período",
+    "periodOptions": {
+      "last7days": "Últimos 7 dias",
+      "today": "Hoje",
+      "yesterday": "Ontem",
+      "custom": "Personalizado"
+    },
+    "startDate": "Data início",
+    "endDate": "Data fim",
+    "startDatePlaceholder": "Selecione a data inicial",
+    "endDatePlaceholder": "Selecione a data final"
+  },
+  "lastUpdates": {
+    "lastUpdateLabel": "Última Atualização RegManager:"
+  },
+  "calendar": {
+    "daysOfWeek": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+    "months": [
+      "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+      "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ],
+    "clear": "Limpar",
+    "close": "Fechar"
+  },
+  "search": {
+    "title": "Pesquisa",
+    "placeholder": "Buscar por Nº, Tipo de Processo ou Interessados",
+    "startDate": "Início",
+    "endDate": "Fim",
+    "results": "Resultados da Busca"
+  },
+  "vectorizationSearch": {
+    "title": "Busca Contextual",
+    "placeholder": "Descreva o que procura ou busque por Nº, Tipo de Processo ou Interessados",
+    "results": "Resultados da Busca",
+    "searching": "Buscando processos...",
+    "noResults": "Nenhum resultado encontrado para sua busca.",
+    "processFound": "Resumo do Processo:",
+    "relatedExcerpt": "Trecho Relacionado:",
+    "viewFullProcess": "VER PROCESSO",
+    "aiSummary": "Justificativa:"
+  },
+  "processDetails": {
+    "title": "Detalhes do Processo",
+    "loading": "Carregando detalhes...",
+    "back": "Voltar",
+    "backToProcesses": "VOLTAR PARA PROCESSOS",
+    "download": "DOWNLOAD",
+    "processNumber": "Número do Processo:",
+    "interested": "Interessados:",
+    "type": "Tipo:",
+    "generationDate": "Data de Geração:",
+    "lastUpdate": "Última Atualização:",
+    "regmanagerSummary": "Resumo RegManager",
+    "citedEmails": "E-mails citados:",
+    "protocols": "Protocolos",
+    "progress": "Andamentos",
+    "mainInfo": "Informações Principais",
+    "protocolInfo": "Informações do Protocolo",
+    "summary": "Resumo e Observações",
+    "actions": "Ações",
+    "downloadProcess": "Baixar Processo",
+    "viewHistory": "Ver Histórico",
+    "notFound": "Processo não encontrado",
+    "notFoundMessage": "O processo que você está procurando não existe ou foi removido.",
+    "backToList": "Voltar para a lista",
+    "noSummaryAvailable": "Resumo não disponível para este processo.",
+    "citedCompanies": "Empresas citadas:",
+    "basinsFieldsPlatforms": "Bacias, campos, plataformas, embarcações, poços e coordenadas:",
+    "relatedActivities": "Atividades relacionadas:",
+    "equipmentsAndSystems": "Equipamentos e sistemas citados:",
+    "violationDetails": "Detalhamento da Infração",
+    "processDetailsSection": "Detalhamento do Processo",
+    "violationType": "Tipo de Infração:",
+    "expectedRange": "Intervalo Esperado:",
+    "measuredRange": "Intervalo Medido:",
+    "substances": "Substâncias:",
+    "inspectionDate": "Data da Inspeção:",
+    "defenseSubmitted": "Apresentação de Defesa:",
+    "defenseDate": "Data da Defesa:",
+    "cnpjs": "CNPJ(s):",
+    "companyNames": "Razão Social:"
+  },
+  "tabs": {
+    "overview": "VISÃO GERAL",
+    "protocols": "PROTOCOLOS",
+    "progress": "ANDAMENTOS"
+  },
+  "tableProtocols": {
+    "loading": "Carregando protocolos...",
+    "noProtocolsFound": "Nenhum protocolo encontrado",
+    "noProtocolsAvailable": "Não há protocolos disponíveis no momento.",
+    "headers": {
+      "processDocument": "Processo/Documento",
+      "type": "Tipo",
+      "date": "Data",
+      "inclusionDate": "Data de Inclusão",
+      "unit": "Unidade"
+    }
+  },
+  "tableOngoing": {
+    "loading": "Carregando andamentos...",
+    "noOngoingFound": "Nenhum andamento encontrado",
+    "noOngoingAvailable": "Não há andamentos disponíveis no momento.",
+    "headers": {
+      "dateTime": "Data/Hora",
+      "unit": "Unidade",
+      "description": "Descrição"
+    }
+  },
+  "pagination": {
+    "showing": "Mostrando",
+    "to": "a",
+    "of": "de",
+    "results": "resultados"
+  }
+}
