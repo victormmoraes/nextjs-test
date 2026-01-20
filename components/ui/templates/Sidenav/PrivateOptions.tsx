@@ -24,31 +24,27 @@ export interface PrivateOptionsProps {
 // Route configuration for menu items
 const ROUTE_CONFIG = [
   { pattern: '/genai', item: 'genai' },
-  { pattern: '/home/gen-ai', item: 'genai' },
   { pattern: '/last-updates', item: 'updates' },
-  { pattern: '/home/processes/favorites', item: 'processos', subItem: 'favoritos' },
-  { pattern: '/home/processes/vectorization-search', item: 'processos', subItem: 'vetorizacao' },
-  { pattern: '/home/processes/search', item: 'processos', subItem: 'buscar' },
-  { pattern: '/home/paineis', item: 'paineis' },
-  { pattern: '/home/processos', item: 'processos' },
-  { pattern: '/home/alertas', item: 'alertas' },
-  { pattern: '/home/admin', item: 'admin' },
-  { pattern: '/home/settings/language', item: 'idiomas' },
+  { pattern: '/processes/favorites', item: 'processos', subItem: 'favoritos' },
+  { pattern: '/processes/vectorization-search', item: 'processos', subItem: 'vetorizacao' },
+  { pattern: '/processes/search', item: 'processos', subItem: 'buscar' },
+  { pattern: '/processes/details', item: 'processos' },
+  { pattern: '/settings/language', item: 'idiomas' },
 ] as const;
 
 // Navigation routes for menu items
 const NAV_ROUTES: Record<string, string> = {
   genai: '/genai',
   updates: '/last-updates',
-  idiomas: '/home/settings/language',
+  idiomas: '/settings/language',
 };
 
 // Sub-item routes
 const SUB_ITEM_ROUTES: Record<string, Record<string, string>> = {
   processos: {
-    favoritos: '/home/processes/favorites',
-    buscar: '/home/processes/search',
-    vetorizacao: '/home/processes/vectorization-search',
+    favoritos: '/processes/favorites',
+    buscar: '/processes/search',
+    vetorizacao: '/processes/vectorization-search',
   },
 };
 

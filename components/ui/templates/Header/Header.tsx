@@ -26,21 +26,11 @@ export interface HeaderProps {
 
 const routeTitleMap: Record<string, string> = {
   '/genai': 'menu.private.genAI',
-  '/home/gen-ai': 'menu.private.genAI',
   '/last-updates': 'menu.private.lastUpdates',
-  '/home/dashboards': 'menu.private.dashboards',
-  '/home/interdictions': 'menu.private.interdictions',
-  '/home/conditioners': 'menu.private.conditioners',
-  '/home/processes': 'menu.private.processes',
-  '/home/processes/favorites': 'menu.private.favorites',
-  '/home/processes/search': 'menu.private.searchProcesses',
-  '/home/processes/vectorization-search': 'menu.private.vectorizationSearch',
-  '/home/alerts/create': 'menu.private.createAlerts',
-  '/home/alerts/manage': 'menu.private.manageAlerts',
-  '/home/admin': 'menu.private.admin',
-  '/home/settings/language': 'language.title',
-  '/public/gen-ai': 'menu.private.genAI',
-  '/public': 'menu.private.genAI',
+  '/processes/favorites': 'menu.private.favorites',
+  '/processes/search': 'menu.private.searchProcesses',
+  '/processes/vectorization-search': 'menu.private.vectorizationSearch',
+  '/settings/language': 'language.title',
 };
 
 export function Header({
