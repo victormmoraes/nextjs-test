@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import {
@@ -25,6 +25,7 @@ export interface HeaderProps {
 }
 
 const routeTitleMap: Record<string, string> = {
+  '/genai': 'menu.private.genAI',
   '/home/gen-ai': 'menu.private.genAI',
   '/home/last-updates': 'menu.private.lastUpdates',
   '/home/dashboards': 'menu.private.dashboards',
@@ -55,7 +56,8 @@ export function Header({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
 
-  const dropdownRef = useClickOutside<HTMLDivElement>(() => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  useClickOutside(dropdownRef, () => {
     setIsDropdownOpen(false);
   });
 
@@ -195,27 +197,27 @@ export function Header({
       </header>
 
       {/* Help Modal */}
-      <Modal
-        isOpen={showHelpModal}
-        title={t('auth.login.helpModal.title')}
-        hasFooter
-        onClose={() => setShowHelpModal(false)}
-        footer={
-          <Button variant="primary" onClick={() => setShowHelpModal(false)}>
-            {t('auth.login.helpModal.close')}
-          </Button>
-        }
-      >
-        <div className="space-y-4">
-          <p className="text-gray-700">{t('auth.login.helpModal.message')}</p>
-          <a
-            href="mailto:suporte@rioanalytics.com.br"
-            className="block text-primary-800 hover:text-primary-600 font-medium transition-colors"
-          >
-            suporte@rioanalytics.com.br
-          </a>
-        </div>
-      </Modal>
+      {showHelpModal && (
+        <Modal
+          title={t('auth.login.helpModal.title')}
+          onClose={() => setShowHelpModal(false)}
+          footer={
+            <Button variant="primary" onClick={() => setShowHelpModal(false)}>
+              {t('auth.login.helpModal.close')}
+            </Button>
+          }
+        >
+          <div className="space-y-4">
+            <p className="text-gray-700">{t('auth.login.helpModal.message')}</p>
+            <a
+              href="mailto:suporte@rioanalytics.com.br"
+              className="block text-primary-800 hover:text-primary-600 font-medium transition-colors"
+            >
+              suporte@rioanalytics.com.br
+            </a>
+          </div>
+        </Modal>
+      )}
     </>
   );
 }

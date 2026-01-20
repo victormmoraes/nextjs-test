@@ -39,7 +39,7 @@ export function PrivateOptions({
   }, [pathname]);
 
   const setActiveByRoute = (url: string) => {
-    if (url.includes('/home/gen-ai')) {
+    if (url.includes('/genai') || url.includes('/home/gen-ai')) {
       setActiveItem('genai');
     } else if (url.includes('/home/last-updates')) {
       setActiveItem('updates');
@@ -90,7 +90,7 @@ export function PrivateOptions({
     setOpenDropdown(null);
 
     if (item === 'genai') {
-      router.push('/home/gen-ai');
+      router.push('/genai');
     } else if (item === 'updates') {
       router.push('/home/last-updates');
     } else if (item === 'idiomas') {
